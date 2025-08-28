@@ -6,6 +6,7 @@ import { ProjectDeployments } from './ProjectDeployments';
 import { ProjectTeam } from './ProjectTeam';
 import { ProjectAlerts } from './ProjectAlerts';
 import { ProjectSettings } from './ProjectSettings';
+import { ProjectTesting } from './ProjectTesting';
 import { NotificationCenter } from './NotificationCenter';
 import { mockProjects } from '../data/projects';
 import { stacks } from '../data/stacks';
@@ -23,12 +24,13 @@ import {
   CheckCircle,
   Bell,
   Shield,
-  ArrowLeft
+  ArrowLeft,
+  TestTube
 } from 'lucide-react';
 
 export const ProjectOverview: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const [activeTab, setActiveTab] = useState<'overview' | 'environments' | 'deployments' | 'logs' | 'team' | 'alerts' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'environments' | 'deployments' | 'logs' | 'team' | 'alerts' | 'testing' | 'settings'>('overview');
   
   const project = projectId ? mockProjects.find(p => p.id === projectId) : null;
   const stackInfo = project ? stacks.find(s => s.id === project.stack) : null;
@@ -69,6 +71,7 @@ export const ProjectOverview: React.FC = () => {
     { id: 'logs', label: 'Logs', icon: FileText },
     { id: 'team', label: 'Team', icon: Users },
     { id: 'alerts', label: 'Alerts', icon: Bell },
+    { id: 'testing', label: 'Testing', icon: TestTube },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -84,6 +87,8 @@ export const ProjectOverview: React.FC = () => {
         return <ProjectTeam projectId={projectId!} />;
       case 'alerts':
         return <ProjectAlerts projectId={projectId!} />;
+      case 'testing':
+        return <ProjectTesting projectId={projectId!} />;
       case 'settings':
         return <ProjectSettings projectId={projectId!} />;
       default:
