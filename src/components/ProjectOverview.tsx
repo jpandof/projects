@@ -286,27 +286,6 @@ export const ProjectOverview: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
-          {/* Project Header */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
-                <p className="text-gray-600 mt-1">{project.description}</p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(project.status)}`}>
-                  {project.status}
-                </span>
-                {stackInfo && (
-                  <div className="flex items-center space-x-2">
-                    <div className={`w-3 h-3 rounded-full ${stackInfo.color}`}></div>
-                    <span className="text-sm font-medium text-gray-700">{stackInfo.label}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
           {/* Navigation Tabs */}
           <div className="bg-white rounded-lg shadow-sm border">
             <div className="border-b border-gray-200">
