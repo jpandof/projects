@@ -30,7 +30,7 @@ import {
   ArrowLeft,
   TestTube,
   Bot,
-  Gauge
+  Gauge,
   ExternalLink
 } from 'lucide-react';
 
