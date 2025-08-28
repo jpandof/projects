@@ -3,6 +3,9 @@ import { stacks } from '../data/stacks';
 import { useProvisioner } from '../store/useProvisioner';
 import { CheckCircle, Lock } from 'lucide-react';
 
+// Simple fallback icon as base64 SVG
+const FALLBACK_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzZCNzI4MCIvPgo8dGV4dCB4PSIyMCIgeT0iMjYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4/PC90ZXh0Pgo8L3N2Zz4K';
+
 interface StackPickerProps {
   disabled?: boolean;
   lockedStack?: string;
@@ -11,6 +14,7 @@ interface StackPickerProps {
 export const StackPicker: React.FC<StackPickerProps> = ({ disabled = false, lockedStack }) => {
   const { selectedStack, setSelectedStack } = useProvisioner();
   const [hoveredStack, setHoveredStack] = React.useState<string | null>(null);
+  const [failedImages, setFailedImages] = React.useState<Set<string>>(new Set());
 
   const getStackLogo = (stackId: string) => {
     const logos: Record<string, string> = {
@@ -20,8 +24,12 @@ export const StackPicker: React.FC<StackPickerProps> = ({ disabled = false, lock
       'go': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg',
       'python': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg'
     };
-    return logos[stackId] || 'https://via.placeholder.com/48x48/6B7280/FFFFFF?text=?';
+    return failedImages.has(stackId) ? FALLBACK_ICON : (logos[stackId] || FALLBACK_ICON);
   };
+
+  const handleImageError = React.useCallback((stackId: string) => {
+    setFailedImages(prev => new Set(prev).add(stackId));
+  }, []);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border p-3">
@@ -69,10 +77,7 @@ export const StackPicker: React.FC<StackPickerProps> = ({ disabled = false, lock
                     src={getStackLogo(stack.id)} 
                     alt={stack.label}
                     className="w-10 h-10 object-contain"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'https://via.placeholder.com/40x40/6B7280/FFFFFF?text=?';
-                    }}
+                    onError={() => handleImageError(stack.id)}
                   />
                   
                   {isLocked ? (

@@ -3,10 +3,14 @@ import { provisions, categoryLabels } from '../data/provisions';
 import { useProvisioner } from '../store/useProvisioner';
 import { Package, Settings, Check } from 'lucide-react';
 
+// Simple fallback icon as base64 SVG
+const FALLBACK_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzZCNzI4MCIvPgo8dGV4dCB4PSIxNiIgeT0iMjEiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4/PC90ZXh0Pgo8L3N2Zz4K';
+
 export const ProvisionList: React.FC = () => {
   const { selectedStack, selectedProvisions, toggleProvision, updateProvisionVersion } = useProvisioner();
   const [hoveredProvision, setHoveredProvision] = useState<string | null>(null);
   const [showVersionModal, setShowVersionModal] = useState<string | null>(null);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   if (!selectedStack) {
     return (
@@ -78,8 +82,12 @@ export const ProvisionList: React.FC = () => {
       'otel-python': 'https://opentelemetry.io/img/logos/opentelemetry-logo-nav.png',
       'poetry': 'https://python-poetry.org/images/logo-origami.svg'
     };
-    return logos[id] || 'https://via.placeholder.com/32x32/6B7280/FFFFFF?text=?';
+    return failedImages.has(id) ? FALLBACK_ICON : (logos[id] || FALLBACK_ICON);
   };
+
+  const handleImageError = React.useCallback((id: string) => {
+    setFailedImages(prev => new Set(prev).add(id));
+  }, []);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border p-3">
@@ -115,10 +123,7 @@ export const ProvisionList: React.FC = () => {
                         src={getProvisionLogo(item.id)} 
                         alt={item.label}
                         className="w-8 h-8 object-contain mb-1"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = 'https://via.placeholder.com/32x32/6B7280/FFFFFF?text=?';
-                        }}
+                        onError={() => handleImageError(item.id)}
                       />
                       <span className="text-xs text-gray-600 text-center leading-tight truncate w-full px-0.5">
                         {item.label.length > 8 ? item.label.substring(0, 8) + '...' : item.label}
