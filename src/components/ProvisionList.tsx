@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { provisions, categoryLabels, categoryIcons } from '../data/provisions';
+import { provisions, categoryLabels } from '../data/provisions';
 import { useProvisioner } from '../store/useProvisioner';
-import { Package, Settings, Check, Info } from 'lucide-react';
+import { Package, Settings, Check } from 'lucide-react';
 
 export const ProvisionList: React.FC = () => {
   const { selectedStack, selectedProvisions, toggleProvision, updateProvisionVersion } = useProvisioner();
@@ -10,11 +10,11 @@ export const ProvisionList: React.FC = () => {
 
   if (!selectedStack) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Provisions</h3>
-        <div className="text-center py-12">
-          <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">Select a technology stack to view available provisions</p>
+      <div className="bg-white rounded-lg shadow-sm border p-4">
+        <h3 className="text-lg font-medium text-gray-900 mb-3">Provisions</h3>
+        <div className="text-center py-8">
+          <Package className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+          <p className="text-gray-500 text-sm">Select a technology stack to view available provisions</p>
         </div>
       </div>
     );
@@ -23,9 +23,9 @@ export const ProvisionList: React.FC = () => {
   const stackProvisions = provisions.find(p => p.stackId === selectedStack);
   if (!stackProvisions) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Provisions</h3>
-        <p className="text-gray-500">No provisions available for this stack</p>
+      <div className="bg-white rounded-lg shadow-sm border p-4">
+        <h3 className="text-lg font-medium text-gray-900 mb-3">Provisions</h3>
+        <p className="text-gray-500 text-sm">No provisions available for this stack</p>
       </div>
     );
   }
@@ -40,33 +40,58 @@ export const ProvisionList: React.FC = () => {
     return acc;
   }, {} as Record<string, typeof stackProvisions.items>);
 
-  const getProvisionIcon = (category: string) => {
-    const icons = {
-      'code-quality': '🔧',
-      'testing': '🧪',
-      'observability': '📊',
-      'database': '🗄️',
-      'messaging': '📨',
-      'deployment': '🚀',
-      'security': '🔒'
+  const getProvisionLogo = (id: string) => {
+    const logos: Record<string, string> = {
+      // React ecosystem
+      'eslint-prettier': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/eslint/eslint-original.svg',
+      'testing-library': 'https://testing-library.com/img/octopus-128x128.png',
+      'playwright-e2e': 'https://playwright.dev/img/playwright-logo.svg',
+      'tailwind': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg',
+      'otel-web': 'https://opentelemetry.io/img/logos/opentelemetry-logo-nav.png',
+      
+      // Java ecosystem
+      'actuator': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg',
+      'otel-sdk': 'https://opentelemetry.io/img/logos/opentelemetry-logo-nav.png',
+      'testcontainers': 'https://www.testcontainers.org/logo.svg',
+      'flyway': 'https://flywaydb.org/assets/logo/flyway-logo.png',
+      'kafka-client': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apachekafka/apachekafka-original.svg',
+      
+      // Node ecosystem
+      'eslint-node': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/eslint/eslint-original.svg',
+      'jest': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jest/jest-plain.svg',
+      'supertest': 'https://avatars.githubusercontent.com/u/6078720?s=200&v=4',
+      'pino-logger': 'https://getpino.io/img/pino-banner.png',
+      'otel-node': 'https://opentelemetry.io/img/logos/opentelemetry-logo-nav.png',
+      'kafka-nats-client': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apachekafka/apachekafka-original.svg',
+      
+      // Go ecosystem
+      'golangci-lint': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg',
+      'zap-logger': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg',
+      'otel-go': 'https://opentelemetry.io/img/logos/opentelemetry-logo-nav.png',
+      'chi-gin-middlewares': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg',
+      'testcontainers-go': 'https://www.testcontainers.org/logo.svg',
+      
+      // Python ecosystem
+      'ruff-black': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg',
+      'pytest': 'https://docs.pytest.org/en/stable/_static/pytest_logo_curves.svg',
+      'fastapi-extras': 'https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png',
+      'otel-python': 'https://opentelemetry.io/img/logos/opentelemetry-logo-nav.png',
+      'poetry': 'https://python-poetry.org/images/logo-origami.svg'
     };
-    return icons[category as keyof typeof icons] || '📦';
+    return logos[id] || 'https://via.placeholder.com/32x32/6B7280/FFFFFF?text=?';
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-6">Available Provisions</h3>
-      <div className="space-y-6">
+    <div className="bg-white rounded-lg shadow-sm border p-4">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">Available Provisions</h3>
+      <div className="space-y-4">
         {Object.entries(groupedProvisions).map(([category, items]) => (
-          <div key={category} className="border border-gray-200 rounded-lg p-4">
-            <div className="flex items-center space-x-2 mb-4">
-              <span className="text-lg">{categoryIcons[category as keyof typeof categoryIcons]}</span>
-              <h4 className="font-semibold text-gray-900">{categoryLabels[category as keyof typeof categoryLabels]}</h4>
-              <span className="text-sm text-gray-500">({items.length})</span>
-            </div>
+          <div key={category} className="border border-gray-100 rounded-lg p-3">
+            <h4 className="font-medium text-gray-900 text-sm mb-3">
+              {categoryLabels[category as keyof typeof categoryLabels]} ({items.length})
+            </h4>
             
-            {/* Compact Grid Layout */}
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-14 gap-2">
               {items.map((item) => {
                 const isSelected = selectedProvisions.some(p => p.id === item.id);
                 const selectedProvision = selectedProvisions.find(p => p.id === item.id);
@@ -74,51 +99,55 @@ export const ProvisionList: React.FC = () => {
 
                 return (
                   <div key={item.id} className="relative">
-                    {/* Provision Square */}
                     <button
                       onClick={() => toggleProvision(item.id, item.label, item.defaultVersion)}
                       onMouseEnter={() => setHoveredProvision(item.id)}
                       onMouseLeave={() => setHoveredProvision(null)}
                       className={`
-                        relative w-16 h-16 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center group
+                        relative w-14 h-14 rounded-lg border transition-all duration-150 flex flex-col items-center justify-center p-1 group
                         ${isSelected 
-                          ? 'border-blue-500 bg-blue-50 shadow-md' 
+                          ? 'border-blue-500 bg-blue-50 shadow-sm' 
                           : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
                         }
                       `}
                     >
-                      {/* Icon */}
-                      <div className="text-xl mb-1">
-                        {getProvisionIcon(item.category)}
-                      </div>
+                      <img 
+                        src={getProvisionLogo(item.id)} 
+                        alt={item.label}
+                        className="w-6 h-6 object-contain mb-1"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://via.placeholder.com/24x24/6B7280/FFFFFF?text=?';
+                        }}
+                      />
+                      <span className="text-xs text-gray-600 text-center leading-tight truncate w-full px-0.5">
+                        {item.label.split(' ')[0]}
+                      </span>
                       
-                      {/* Selected Indicator */}
                       {isSelected && (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                          <Check className="h-3 w-3 text-white" />
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                          <Check className="h-2.5 w-2.5 text-white" />
                         </div>
                       )}
 
-                      {/* Version Indicator */}
                       {item.versions && isSelected && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setShowVersionModal(item.id);
                           }}
-                          className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-600 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
+                          className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-600 rounded-full flex items-center justify-center hover:bg-gray-700 transition-colors"
                         >
-                          <Settings className="h-2.5 w-2.5 text-white" />
+                          <Settings className="h-2 w-2 text-white" />
                         </button>
                       )}
                     </button>
 
-                    {/* Tooltip */}
                     {hoveredProvision === item.id && (
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
-                        <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
+                        <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg max-w-48">
                           <div className="font-medium">{item.label}</div>
-                          <div className="text-gray-300 mt-1 max-w-48 whitespace-normal">
+                          <div className="text-gray-300 mt-1 whitespace-normal">
                             {item.description}
                           </div>
                           {currentVersion && (
@@ -126,21 +155,23 @@ export const ProvisionList: React.FC = () => {
                               v{currentVersion}
                             </div>
                           )}
-                          {/* Tooltip Arrow */}
                           <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
                         </div>
                       </div>
                     )}
 
-                    {/* Version Selection Modal */}
                     {showVersionModal === item.id && item.versions && (
                       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-                          <div className="flex items-center space-x-2 mb-4">
-                            <span className="text-xl">{getProvisionIcon(item.category)}</span>
+                        <div className="bg-white rounded-lg p-4 max-w-sm w-full mx-4">
+                          <div className="flex items-center space-x-2 mb-3">
+                            <img 
+                              src={getProvisionLogo(item.id)} 
+                              alt={item.label}
+                              className="w-6 h-6 object-contain"
+                            />
                             <h3 className="text-lg font-medium text-gray-900">{item.label}</h3>
                           </div>
-                          <p className="text-sm text-gray-600 mb-4">{item.description}</p>
+                          <p className="text-sm text-gray-600 mb-3">{item.description}</p>
                           <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">
                               Select Version:
@@ -151,7 +182,7 @@ export const ProvisionList: React.FC = () => {
                                 updateProvisionVersion(item.id, e.target.value);
                                 setShowVersionModal(null);
                               }}
-                              className="w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
                             >
                               {item.versions.map((version) => (
                                 <option key={version} value={version}>
@@ -160,10 +191,10 @@ export const ProvisionList: React.FC = () => {
                               ))}
                             </select>
                           </div>
-                          <div className="flex space-x-3 mt-6">
+                          <div className="flex space-x-2 mt-4">
                             <button
                               onClick={() => setShowVersionModal(null)}
-                              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                              className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
                             >
                               Cancel
                             </button>
