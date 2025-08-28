@@ -45,13 +45,6 @@ export const StackPicker: React.FC<StackPickerProps> = ({ disabled = false, lock
           </p>
         </div>
       )}
-      {disabled && isNewProject && (
-        <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
-            <strong>Complete project information first:</strong> Fill out the project details to enable stack selection.
-          </p>
-        </div>
-      )}
       
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
         {stacks.map((stack) => {

@@ -116,7 +116,7 @@ export const ProvisionerPage: React.FC = () => {
             
             {/* Stack Picker - Always visible but disabled until project is created for new projects */}
             <StackPicker 
-              disabled={!isNewProject ? true : (isNewProject && !projectCreated)}
+              disabled={!isNewProject ? true : false}
               isNewProject={isNewProject}
               lockedStack={currentProject?.stack}
             />
