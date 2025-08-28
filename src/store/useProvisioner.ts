@@ -67,6 +67,17 @@ export const useProvisioner = create<ProvisionerState>()(
       },
       toggleProvision: (id, label, version) => {
         const { selectedProvisions } = get();
+        
+        // Check if this provision is required for the current stack
+        const currentStack = get().selectedStack;
+        const stackProvisions = provisions.find(p => p.stackId === currentStack);
+        const provision = stackProvisions?.items.find(item => item.id === id);
+        
+        // Don't allow toggling required provisions
+        if (provision?.required) {
+          return;
+        }
+        
         const existing = selectedProvisions.find(p => p.id === id);
         
         let newProvisions: SelectedProvision[];

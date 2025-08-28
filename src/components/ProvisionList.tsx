@@ -109,17 +109,20 @@ export const ProvisionList: React.FC = () => {
                 return (
                   <div key={item.id} className="relative">
                     <button
-                      onClick={() => toggleProvision(item.id, item.label, item.defaultVersion)}
+                      onClick={() => !item.required && toggleProvision(item.id, item.label, item.defaultVersion)}
                       onMouseEnter={() => setHoveredProvision(item.id)}
                       onMouseLeave={() => setHoveredProvision(null)}
                       className={`
                         relative w-16 h-16 rounded-lg border transition-all duration-150 flex flex-col items-center justify-center p-1 group
                         ${isSelected 
-                          ? 'border-blue-500 bg-blue-50 shadow-sm'
+                          ? item.required
+                            ? 'border-orange-500 bg-orange-100 shadow-sm'
+                            : 'border-blue-500 bg-blue-50 shadow-sm'
                           : item.required
-                          ? 'border-orange-300 bg-orange-50 hover:border-orange-400 hover:shadow-sm'
-                          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                            ? 'border-orange-300 bg-orange-50'
+                            : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm cursor-pointer'
                         }
+                        ${item.required ? 'cursor-not-allowed' : 'cursor-pointer'}
                       `}
                     >
                       <img 
@@ -132,13 +135,13 @@ export const ProvisionList: React.FC = () => {
                         {item.label.length > 8 ? item.label.substring(0, 8) + '...' : item.label}
                       </span>
                       
-                      {item.required && !isSelected && (
-                        <div className="absolute -top-1 -left-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">!</span>
+                      {item.required && (
+                        <div className="absolute -top-1 -left-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center border-2 border-white">
+                          <span className="text-white text-xs font-bold">R</span>
                         </div>
                       )}
                       
-                      {isSelected && (
+                      {isSelected && !item.required && (
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
                           <Check className="h-2.5 w-2.5 text-white" />
                         </div>
@@ -163,7 +166,7 @@ export const ProvisionList: React.FC = () => {
                           <div className="font-medium">{item.label}</div>
                           {item.required && (
                             <div className="text-orange-300 mb-1 font-medium">
-                              ⚠️ Requerido para esta tecnología
+                              🔒 Obligatorio para esta tecnología (no se puede deseleccionar)
                             </div>
                           )}
                           <div className="text-gray-300 mb-2 leading-relaxed whitespace-normal">
