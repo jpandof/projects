@@ -77,11 +77,11 @@ export const SummaryPanel: React.FC<SummaryPanelProps> = ({ onCreateMR }) => {
             Selected Provisions ({selectedProvisions.length})
           </h4>
           {selectedProvisions.length > 0 ? (
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
               {selectedProvisions.map((provision) => (
-                <div key={provision.id} className="flex items-center space-x-2 p-2 bg-gray-50 rounded">
+                <div key={provision.id} className="flex items-center space-x-2 p-2 bg-gray-50 rounded text-sm">
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-gray-900">{provision.label}</span>
+                  <span className="text-gray-900 flex-1 truncate">{provision.label}</span>
                   {provision.version && (
                     <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                       {provision.version}
