@@ -159,14 +159,14 @@ export const ProvisionList: React.FC = () => {
 
                     {hoveredProvision === item.id && (
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
-                        <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg max-w-48">
+                        <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg max-w-xs w-64">
                           <div className="font-medium">{item.label}</div>
                           {item.required && (
                             <div className="text-orange-300 mb-1 font-medium">
                               ⚠️ Requerido para esta tecnología
                             </div>
                           )}
-                          <div className="text-gray-300 mb-2 leading-relaxed">
+                          <div className="text-gray-300 mb-2 leading-relaxed whitespace-normal">
                             {item.detailedDescription || item.description}
                           </div>
                           {currentVersion && (
