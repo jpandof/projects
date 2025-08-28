@@ -39,29 +39,29 @@ export const SummaryPanel: React.FC<SummaryPanelProps> = ({ onCreateMR }) => {
   return (
     <>
       <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex items-center space-x-2 mb-6">
+        <div className="flex items-center space-x-2 mb-4">
           <FileText className="h-5 w-5 text-blue-500" />
           <h3 className="text-lg font-medium text-gray-900">Summary</h3>
         </div>
 
         {/* Project Context */}
         {currentProject && (
-          <div className="mb-6">
+          <div className="mb-4">
             <h4 className="text-sm font-medium text-gray-700 mb-2">Current Project</h4>
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <div className="font-medium text-gray-900">{currentProject.name}</div>
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <div className="font-medium text-gray-900 text-sm">{currentProject.name}</div>
               <div className="text-sm text-gray-600">{currentProject.description}</div>
             </div>
           </div>
         )}
 
         {/* Selected Stack */}
-        <div className="mb-6">
+        <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-700 mb-2">Selected Stack</h4>
           {selectedStackInfo ? (
-            <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+            <div className="flex items-center space-x-2 p-2 bg-blue-50 rounded-lg">
               <div className={`w-3 h-3 rounded-full ${selectedStackInfo.color}`}></div>
-              <span className="font-medium text-gray-900">{selectedStackInfo.label}</span>
+              <span className="font-medium text-gray-900 text-sm">{selectedStackInfo.label}</span>
             </div>
           ) : (
             <div className="flex items-center space-x-2 text-gray-500">
@@ -72,7 +72,7 @@ export const SummaryPanel: React.FC<SummaryPanelProps> = ({ onCreateMR }) => {
         </div>
 
         {/* Selected Provisions */}
-        <div className="mb-6">
+        <div className="mb-4">
           <h4 className="text-sm font-medium text-gray-700 mb-2">
             Selected Provisions ({selectedProvisions.length})
           </h4>
@@ -91,12 +91,12 @@ export const SummaryPanel: React.FC<SummaryPanelProps> = ({ onCreateMR }) => {
               ))}
             </div>
           ) : (
-            <div className="text-sm text-gray-500 italic">No provisions selected</div>
+            <div className="text-xs text-gray-500 italic">No provisions selected</div>
           )}
         </div>
 
         {/* Change Plan */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-sm font-medium text-gray-700">Change Plan</h4>
             <button
@@ -104,7 +104,7 @@ export const SummaryPanel: React.FC<SummaryPanelProps> = ({ onCreateMR }) => {
               disabled={!plan}
               className={`flex items-center space-x-2 px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                 plan
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 text-xs'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
             >
@@ -113,12 +113,12 @@ export const SummaryPanel: React.FC<SummaryPanelProps> = ({ onCreateMR }) => {
             </button>
           </div>
           {plan ? (
-            <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm whitespace-pre-wrap font-mono">
+            <pre className="bg-gray-900 text-gray-100 p-3 rounded-lg text-xs whitespace-pre-wrap font-mono">
               {plan}
             </pre>
           ) : (
-            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
-              <p className="text-gray-500 text-sm">No changes planned</p>
+            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-4 text-center">
+              <p className="text-gray-500 text-xs">No changes planned</p>
             </div>
           )}
         </div>

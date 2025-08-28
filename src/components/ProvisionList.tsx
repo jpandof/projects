@@ -10,9 +10,9 @@ export const ProvisionList: React.FC = () => {
 
   if (!selectedStack) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border p-4">
-        <h3 className="text-lg font-medium text-gray-900 mb-3">Provisions</h3>
-        <div className="text-center py-8">
+      <div className="bg-white rounded-lg shadow-sm border p-3">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Provisions</h3>
+        <div className="text-center py-6">
           <Package className="h-8 w-8 text-gray-400 mx-auto mb-2" />
           <p className="text-gray-500 text-sm">Select a technology stack to view available provisions</p>
         </div>
@@ -23,8 +23,8 @@ export const ProvisionList: React.FC = () => {
   const stackProvisions = provisions.find(p => p.stackId === selectedStack);
   if (!stackProvisions) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border p-4">
-        <h3 className="text-lg font-medium text-gray-900 mb-3">Provisions</h3>
+      <div className="bg-white rounded-lg shadow-sm border p-3">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Provisions</h3>
         <p className="text-gray-500 text-sm">No provisions available for this stack</p>
       </div>
     );
@@ -82,16 +82,16 @@ export const ProvisionList: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-4">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Available Provisions</h3>
-      <div className="space-y-4">
+    <div className="bg-white rounded-lg shadow-sm border p-3">
+      <h3 className="text-lg font-medium text-gray-900 mb-3">Available Provisions</h3>
+      <div className="space-y-3">
         {Object.entries(groupedProvisions).map(([category, items]) => (
-          <div key={category} className="border border-gray-100 rounded-lg p-3">
-            <h4 className="font-medium text-gray-900 text-sm mb-3">
+          <div key={category} className="border border-gray-100 rounded-lg p-2">
+            <h4 className="font-medium text-gray-900 text-sm mb-2">
               {categoryLabels[category as keyof typeof categoryLabels]} ({items.length})
             </h4>
             
-            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-14 gap-2">
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-2">
               {items.map((item) => {
                 const isSelected = selectedProvisions.some(p => p.id === item.id);
                 const selectedProvision = selectedProvisions.find(p => p.id === item.id);
@@ -104,7 +104,7 @@ export const ProvisionList: React.FC = () => {
                       onMouseEnter={() => setHoveredProvision(item.id)}
                       onMouseLeave={() => setHoveredProvision(null)}
                       className={`
-                        relative w-14 h-14 rounded-lg border transition-all duration-150 flex flex-col items-center justify-center p-1 group
+                        relative w-16 h-16 rounded-lg border transition-all duration-150 flex flex-col items-center justify-center p-1 group
                         ${isSelected 
                           ? 'border-blue-500 bg-blue-50 shadow-sm' 
                           : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
@@ -114,14 +114,14 @@ export const ProvisionList: React.FC = () => {
                       <img 
                         src={getProvisionLogo(item.id)} 
                         alt={item.label}
-                        className="w-6 h-6 object-contain mb-1"
+                        className="w-8 h-8 object-contain mb-1"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = 'https://via.placeholder.com/24x24/6B7280/FFFFFF?text=?';
+                          target.src = 'https://via.placeholder.com/32x32/6B7280/FFFFFF?text=?';
                         }}
                       />
                       <span className="text-xs text-gray-600 text-center leading-tight truncate w-full px-0.5">
-                        {item.label.split(' ')[0]}
+                        {item.label.length > 8 ? item.label.substring(0, 8) + '...' : item.label}
                       </span>
                       
                       {isSelected && (
