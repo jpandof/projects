@@ -9,6 +9,7 @@ export interface ProjectData {
   name: string;
   description: string;
   projectType: string;
+  gitFlow: string;
   stack: string;
   repository?: string;
   branch: string;

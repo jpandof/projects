@@ -13,6 +13,7 @@ export const ProjectCreationForm: React.FC<ProjectCreationFormProps> = ({ onProj
     name: '',
     description: '',
     projectType: '',
+    gitFlow: 'gitflow',
     repository: '',
     branch: 'main'
   });
@@ -106,6 +107,40 @@ export const ProjectCreationForm: React.FC<ProjectCreationFormProps> = ({ onProj
     }
   ];
 
+  const gitFlowOptions = [
+    {
+      id: 'gitflow',
+      label: 'Git Flow',
+      description: 'Modelo de ramificación con ramas feature, develop, release y hotfix',
+      icon: '🌳',
+      branches: ['main', 'develop', 'feature/*', 'release/*', 'hotfix/*'],
+      recommended: 'Para equipos grandes y releases planificados'
+    },
+    {
+      id: 'github-flow',
+      label: 'GitHub Flow',
+      description: 'Flujo simple con rama main y feature branches',
+      icon: '🚀',
+      branches: ['main', 'feature/*'],
+      recommended: 'Para desarrollo continuo y despliegues frecuentes'
+    },
+    {
+      id: 'trunk-based',
+      label: 'Trunk-based Development',
+      description: 'Desarrollo directo en main con commits frecuentes',
+      icon: '⚡',
+      branches: ['main'],
+      recommended: 'Para equipos experimentados con CI/CD maduro'
+    },
+    {
+      id: 'gitlab-flow',
+      label: 'GitLab Flow',
+      description: 'Combina simplicidad con ambientes de staging y producción',
+      icon: '🔄',
+      branches: ['main', 'staging', 'production', 'feature/*'],
+      recommended: 'Para proyectos con múltiples ambientes'
+    }
+  ];
   const selectedStackInfo = stacks.find(s => s.id === selectedStack);
   const availableProjectTypes = projectTypes.filter(type => 
     !selectedStack || type.stacks.includes(selectedStack)
@@ -278,6 +313,50 @@ export const ProjectCreationForm: React.FC<ProjectCreationFormProps> = ({ onProj
           {errors.projectType && (
             <p className="mt-1 text-sm text-red-600">{errors.projectType}</p>
           )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Estrategia de Git Flow *
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {gitFlowOptions.map((flow) => (
+              <label
+                key={flow.id}
+                className={`relative flex items-start p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
+                  formData.gitFlow === flow.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="gitFlow"
+                  value={flow.id}
+                  checked={formData.gitFlow === flow.id}
+                  onChange={(e) => handleInputChange('gitFlow', e.target.value)}
+                  className="sr-only"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <span className="text-lg">{flow.icon}</span>
+                    <span className="font-medium text-gray-900 text-sm">{flow.label}</span>
+                  </div>
+                  <p className="text-xs text-gray-600 leading-relaxed mb-2">{flow.description}</p>
+                  <div className="text-xs text-blue-600 mb-1">
+                    <strong>Ramas:</strong> {flow.branches.join(', ')}
+                  </div>
+                  <div className="text-xs text-green-600">
+                    <strong>Recomendado:</strong> {flow.recommended}
+                  </div>
+                </div>
+                {formData.gitFlow === flow.id && (
+                  <div className="absolute top-2 right-2 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                  </div>
+                )}
+              </label>
+            ))}
+          </div>
         </div>
 
         {/* Repository URL (Optional) */}

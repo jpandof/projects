@@ -9,9 +9,10 @@ const FALLBACK_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0
 interface StackPickerProps {
   disabled?: boolean;
   lockedStack?: string;
+  isNewProject?: boolean;
 }
 
-export const StackPicker: React.FC<StackPickerProps> = ({ disabled = false, lockedStack }) => {
+export const StackPicker: React.FC<StackPickerProps> = ({ disabled = false, lockedStack, isNewProject = false }) => {
   const { selectedStack, setSelectedStack } = useProvisioner();
   const [hoveredStack, setHoveredStack] = React.useState<string | null>(null);
   const [failedImages, setFailedImages] = React.useState<Set<string>>(new Set());
@@ -37,10 +38,17 @@ export const StackPicker: React.FC<StackPickerProps> = ({ disabled = false, lock
         <h2 className="text-lg font-medium text-gray-900">Select Technology Stack</h2>
         {disabled && <Lock className="h-4 w-4 text-gray-400" />}
       </div>
-      {disabled && (
+      {disabled && !isNewProject && (
         <div className="mb-3 p-2 bg-amber-50 border border-amber-200 rounded-lg">
           <p className="text-sm text-amber-800">
             <strong>Stack locked:</strong> Cannot change the technology stack for existing projects.
+          </p>
+        </div>
+      )}
+      {disabled && isNewProject && (
+        <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>Complete project information first:</strong> Fill out the project details to enable stack selection.
           </p>
         </div>
       )}
