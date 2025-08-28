@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Ant Design customizations */
+.ant-steps-item-title {
+  font-weight: 500 !important;
+}
+
+.ant-radio-button-wrapper {
+  height: auto !important;
+  line-height: normal !important;
+}
+
+.ant-radio-button-wrapper-checked {
+  border-color: #1890ff !important;
+  background: #f0f8ff !important;
+}

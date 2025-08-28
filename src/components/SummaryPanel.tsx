@@ -2,7 +2,7 @@ import React from 'react';
 import { useProvisioner } from '../store/useProvisioner';
 import { stacks } from '../data/stacks';
 import { mockProjects } from '../data/projects';
-import { Copy, FileText, CheckCircle2, AlertCircle, GitMerge } from 'lucide-react';
+import { Copy, FileText, CheckCircle2, AlertCircle, GitMerge, Settings } from 'lucide-react';
 import { MergeRequestModal } from './MergeRequestModal';
 
 interface SummaryPanelProps {
@@ -12,6 +12,7 @@ interface SummaryPanelProps {
 export const SummaryPanel: React.FC<SummaryPanelProps> = ({ onCreateMR }) => {
   const { selectedStack, selectedProvisions, generatePlan, projectContext } = useProvisioner();
   const [showMRModal, setShowMRModal] = React.useState(false);
+  const isNewProject = projectContext.isNewProject;
 
   const selectedStackInfo = stacks.find(s => s.id === selectedStack);
   const currentProject = projectContext.projectId ? mockProjects.find(p => p.id === projectContext.projectId) : null;
@@ -36,6 +37,19 @@ export const SummaryPanel: React.FC<SummaryPanelProps> = ({ onCreateMR }) => {
     onCreateMR?.();
   };
 
+  const getActionButtonText = () => {
+    if (isNewProject) {
+      return 'Apply Configuration';
+    }
+    return 'Create Merge Request';
+  };
+
+  const getActionButtonIcon = () => {
+    if (isNewProject) {
+      return <Settings className="h-4 w-4" />;
+    }
+    return <GitMerge className="h-4 w-4" />;
+  };
   return (
     <>
       <div className="bg-white rounded-lg shadow-md p-6">
@@ -130,8 +144,8 @@ export const SummaryPanel: React.FC<SummaryPanelProps> = ({ onCreateMR }) => {
               onClick={handleCreateMR}
               className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
-              <GitMerge className="h-4 w-4" />
-              <span>Create Merge Request</span>
+              {getActionButtonIcon()}
+              <span>{getActionButtonText()}</span>
             </button>
           </div>
         )}

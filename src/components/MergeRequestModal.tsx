@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, GitMerge, User, Calendar, FileText, Plus, Minus, Check } from 'lucide-react';
+import { X, GitMerge, User, Calendar, FileText, Plus, Minus, Check, Settings } from 'lucide-react';
 import { mockProjects } from '../data/projects';
 import { stacks } from '../data/stacks';
 
@@ -117,6 +117,37 @@ export const MergeRequestModal: React.FC<MergeRequestModalProps> = ({
                 </span>
               </div>
             </div>
+
+            {/* Repository Clone Section - Only for new projects */}
+            {!projectId && project?.repository && (
+              <div className="mt-6 bg-gray-900 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-white font-medium">Ready to start coding?</h4>
+                  <button
+                    onClick={() => handleCopyCommand(`git clone ${project.repository}`)}
+                    className={`px-3 py-1 rounded text-sm transition-colors ${
+                      copySuccess 
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                  >
+                    {copySuccess ? '✓ Copied!' : 'Copy Command'}
+                  </button>
+                </div>
+                <div className="text-left">
+                  <div className="text-gray-400 text-sm mb-1">Clone your repository:</div>
+                  <code className="text-green-400 font-mono text-sm block bg-gray-800 p-2 rounded">
+                    git clone {project.repository}
+                  </code>
+                </div>
+                <div className="mt-3 text-left">
+                  <div className="text-gray-400 text-sm mb-1">Then navigate to your project:</div>
+                  <code className="text-blue-400 font-mono text-sm block bg-gray-800 p-2 rounded">
+                    cd {project.repository.split('/').pop()?.replace('.git', '') || 'your-project'}
+                  </code>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           /* Form State */

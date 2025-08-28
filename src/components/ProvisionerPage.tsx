@@ -1,17 +1,28 @@
 import React, { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { StackPicker } from './StackPicker';
+import { ProjectCreationWizard } from './ProjectCreationWizard';
 import { ProvisionList } from './ProvisionList';
 import { SummaryPanel } from './SummaryPanel';
-import { ProjectCreationForm } from './ProjectCreationForm';
 import { useProvisioner } from '../store/useProvisioner';
 import { mockProjects } from '../data/projects';
-import { Settings, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Settings, RefreshCw, ArrowLeft, Check as CheckIcon } from 'lucide-react';
 
 export const ProvisionerPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { clearSelections, setProjectContext, loadProjectProvisions, selectedStack } = useProvisioner();
+  const [copySuccess, setCopySuccess] = React.useState(false);
+
+  const handleCopyCommand = async (command: string) => {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      alert('Error al copiar el comando');
+    }
+  };
 
   const isNewProject = projectId === 'new';
   const currentProject = projectId && projectId !== 'new' ? mockProjects.find(p => p.id === projectId) : null;
@@ -45,6 +56,7 @@ export const ProvisionerPage: React.FC = () => {
     // Here you would typically save the project to your backend
     // For now, we'll just show the provisions section
   };
+
 
   const canShowProvisions = showProvisions && selectedStack;
 
@@ -109,17 +121,58 @@ export const ProvisionerPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left Column - Stack and Provisions */}
           <div className="lg:col-span-3 space-y-4">
-            {/* Project Creation Form - Only for new projects */}
+            {/* Project Creation Wizard - Only for new projects */}
             {isNewProject && !projectCreated && (
-              <ProjectCreationForm onProjectCreated={handleProjectCreated} />
+              <ProjectCreationWizard onProjectCreated={handleProjectCreated} />
             )}
             
-            {/* Stack Picker - Always visible but disabled until project is created for new projects */}
-            <StackPicker 
-              disabled={!isNewProject ? true : false}
-              isNewProject={isNewProject}
-              lockedStack={currentProject?.stack}
-            />
+            {/* Repository Clone Section - Show after project creation */}
+            {isNewProject && projectCreated && selectedStack && (
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="flex items-center space-x-2 mb-4">
+                  <div className="bg-green-100 p-2 rounded-lg">
+                    <CheckIcon className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">¡Proyecto Creado Exitosamente!</h3>
+                    <p className="text-sm text-gray-500">Tu proyecto está listo para comenzar el desarrollo</p>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-900 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white font-medium">Clona tu repositorio:</h4>
+                    <button
+                      onClick={() => handleCopyCommand(`git clone https://github.com/company/your-project.git`)}
+                      className={`px-3 py-1 rounded text-sm transition-colors ${
+                        copySuccess 
+                          ? 'bg-green-600 text-white' 
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      {copySuccess ? '✓ Copiado!' : 'Copiar Comando'}
+                    </button>
+                  </div>
+                  <div className="text-left">
+                    <code className="text-green-400 font-mono text-sm block bg-gray-800 p-2 rounded">
+                      git clone https://github.com/company/your-project.git
+                    </code>
+                  </div>
+                  <div className="mt-3 text-left">
+                    <div className="text-gray-400 text-sm mb-1">Luego navega a tu proyecto:</div>
+                    <code className="text-blue-400 font-mono text-sm block bg-gray-800 p-2 rounded">
+                      cd your-project
+                    </code>
+                  </div>
+                </div>
+                
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Siguiente paso:</strong> Configura los aprovisionamientos específicos que necesitas para tu proyecto en la sección de abajo.
+                  </p>
+                </div>
+              </div>
+            )}
             
             {/* Provision List - Only show when appropriate */}
             {canShowProvisions && (
