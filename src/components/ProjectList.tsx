@@ -63,14 +63,16 @@ export const ProjectList: React.FC = () => {
                 <p className="text-sm text-gray-500">Manage your technology projects</p>
               </div>
             </div>
-            <Link
-              to="/provisioner/new"
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              <span>New Project</span>
-            </Link>
-            <NotificationCenter />
+            <div className="flex items-center space-x-3">
+              <Link
+                to="/provisioner/new"
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+                <span>New Project</span>
+              </Link>
+              <NotificationCenter />
+            </div>
           </div>
         </div>
       </header>
