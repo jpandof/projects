@@ -15,10 +15,25 @@ export const useProvisioner = create<ProvisionerState>()(
       setSelectedStack: (stackId) => {
         const currentStack = get().selectedStack;
         if (currentStack !== stackId) {
+          // Auto-select required provisions for the new stack
+          const stackProvisions = provisions.find(p => p.stackId === stackId);
+          const requiredProvisions = stackProvisions?.items.filter(item => item.required) || [];
+          
+          const autoSelectedProvisions = requiredProvisions.map(item => ({
+            id: item.id,
+            label: item.label,
+            version: item.defaultVersion
+          }));
+          
+          const autoActions = requiredProvisions.map(item => ({
+            type: 'ADD' as const,
+            item: item.label + (item.defaultVersion ? ` (${item.defaultVersion})` : '')
+          }));
+          
           set({
             selectedStack: stackId,
-            selectedProvisions: [],
-            planActions: []
+            selectedProvisions: autoSelectedProvisions,
+            planActions: autoActions
           });
         }
       },

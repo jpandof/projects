@@ -115,7 +115,9 @@ export const ProvisionList: React.FC = () => {
                       className={`
                         relative w-16 h-16 rounded-lg border transition-all duration-150 flex flex-col items-center justify-center p-1 group
                         ${isSelected 
-                          ? 'border-blue-500 bg-blue-50 shadow-sm' 
+                          ? 'border-blue-500 bg-blue-50 shadow-sm'
+                          : item.required
+                          ? 'border-orange-300 bg-orange-50 hover:border-orange-400 hover:shadow-sm'
                           : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
                         }
                       `}
@@ -129,6 +131,12 @@ export const ProvisionList: React.FC = () => {
                       <span className="text-xs text-gray-600 text-center leading-tight truncate w-full px-0.5">
                         {item.label.length > 8 ? item.label.substring(0, 8) + '...' : item.label}
                       </span>
+                      
+                      {item.required && !isSelected && (
+                        <div className="absolute -top-1 -left-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">!</span>
+                        </div>
+                      )}
                       
                       {isSelected && (
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
@@ -153,8 +161,13 @@ export const ProvisionList: React.FC = () => {
                       <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10">
                         <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg max-w-48">
                           <div className="font-medium">{item.label}</div>
-                          <div className="text-gray-300 mt-1 whitespace-normal">
-                            {item.description}
+                          {item.required && (
+                            <div className="text-orange-300 mb-1 font-medium">
+                              ⚠️ Requerido para esta tecnología
+                            </div>
+                          )}
+                          <div className="text-gray-300 mb-2 leading-relaxed">
+                            {item.detailedDescription || item.description}
                           </div>
                           {currentVersion && (
                             <div className="text-blue-300 mt-1">
