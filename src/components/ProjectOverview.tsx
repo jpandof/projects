@@ -28,7 +28,7 @@ import {
   Shield,
   ArrowLeft,
   TestTube,
-  Bot
+  Bot,
   Gauge
 } from 'lucide-react';
 
