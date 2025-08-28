@@ -8,6 +8,7 @@ import { ProjectAlerts } from './ProjectAlerts';
 import { ProjectSettings } from './ProjectSettings';
 import { ProjectTesting } from './ProjectTesting';
 import { AICodeReview } from './AICodeReview';
+import { ProductivityAnalytics } from './ProductivityAnalytics';
 import { NotificationCenter } from './NotificationCenter';
 import { mockProjects } from '../data/projects';
 import { stacks } from '../data/stacks';
@@ -28,11 +29,12 @@ import {
   ArrowLeft,
   TestTube,
   Bot
+  Gauge
 } from 'lucide-react';
 
 export const ProjectOverview: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const [activeTab, setActiveTab] = useState<'overview' | 'environments' | 'deployments' | 'logs' | 'team' | 'alerts' | 'testing' | 'ai-review' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'environments' | 'deployments' | 'logs' | 'team' | 'alerts' | 'testing' | 'ai-review' | 'productivity' | 'settings'>('overview');
   
   const project = projectId ? mockProjects.find(p => p.id === projectId) : null;
   const stackInfo = project ? stacks.find(s => s.id === project.stack) : null;
@@ -75,6 +77,7 @@ export const ProjectOverview: React.FC = () => {
     { id: 'alerts', label: 'Alerts', icon: Bell },
     { id: 'testing', label: 'Testing', icon: TestTube },
     { id: 'ai-review', label: 'AI Review', icon: Bot },
+    { id: 'productivity', label: 'Productivity', icon: Gauge },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
@@ -94,6 +97,8 @@ export const ProjectOverview: React.FC = () => {
         return <ProjectTesting projectId={projectId!} />;
       case 'ai-review':
         return <AICodeReview projectId={projectId!} />;
+      case 'productivity':
+        return <ProductivityAnalytics projectId={projectId!} />;
       case 'settings':
         return <ProjectSettings projectId={projectId!} />;
       default:
