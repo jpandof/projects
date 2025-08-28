@@ -7,10 +7,15 @@ import { Package, Settings, Check } from 'lucide-react';
 const FALLBACK_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0iIzZCNzI4MCIvPgo8dGV4dCB4PSIxNiIgeT0iMjEiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj4/PC90ZXh0Pgo8L3N2Zz4K';
 
 export const ProvisionList: React.FC = () => {
+  // All hooks must be called at the top, before any conditional returns
   const { selectedStack, selectedProvisions, toggleProvision, updateProvisionVersion } = useProvisioner();
   const [hoveredProvision, setHoveredProvision] = useState<string | null>(null);
   const [showVersionModal, setShowVersionModal] = useState<string | null>(null);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+
+  const handleImageError = React.useCallback((id: string) => {
+    setFailedImages(prev => new Set(prev).add(id));
+  }, []);
 
   if (!selectedStack) {
     return (
