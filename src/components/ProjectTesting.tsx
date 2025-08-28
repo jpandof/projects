@@ -164,6 +164,42 @@ export const ProjectTesting: React.FC<ProjectTestingProps> = ({ projectId }) => 
 
   const renderOverview = () => (
     <div className="space-y-6">
+      {/* Code Quality Ratings */}
+      {qualityMetrics && (
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Code Quality Ratings</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="text-sm text-gray-500 mb-2">Maintainability</div>
+              <div className={`inline-flex items-center px-4 py-3 rounded-full border font-bold text-2xl ${getRatingColor(qualityMetrics.maintainabilityRating)}`}>
+                {qualityMetrics.maintainabilityRating}
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                {qualityMetrics.technicalDebt} technical debt
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-gray-500 mb-2">Reliability</div>
+              <div className={`inline-flex items-center px-4 py-3 rounded-full border font-bold text-2xl ${getRatingColor(qualityMetrics.reliabilityRating)}`}>
+                {qualityMetrics.reliabilityRating}
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                {qualityMetrics.bugs} bugs found
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-gray-500 mb-2">Security</div>
+              <div className={`inline-flex items-center px-4 py-3 rounded-full border font-bold text-2xl ${getRatingColor(qualityMetrics.securityRating)}`}>
+                {qualityMetrics.securityRating}
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                {qualityMetrics.vulnerabilities} vulnerabilities
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow-sm border p-4">
