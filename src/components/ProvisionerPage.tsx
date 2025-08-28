@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { StackPicker } from './StackPicker';
 import { ProvisionList } from './ProvisionList';
 import { SummaryPanel } from './SummaryPanel';
+import { ProjectCreationForm } from './ProjectCreationForm';
 import { useProvisioner } from '../store/useProvisioner';
 import { mockProjects } from '../data/projects';
 import { Settings, RefreshCw, ArrowLeft } from 'lucide-react';
@@ -10,17 +11,21 @@ import { Settings, RefreshCw, ArrowLeft } from 'lucide-react';
 export const ProvisionerPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const { clearSelections, setProjectContext, loadProjectProvisions } = useProvisioner();
+  const { clearSelections, setProjectContext, loadProjectProvisions, selectedStack } = useProvisioner();
 
   const isNewProject = projectId === 'new';
   const currentProject = projectId && projectId !== 'new' ? mockProjects.find(p => p.id === projectId) : null;
+  const [showProvisions, setShowProvisions] = React.useState(!isNewProject);
+  const [projectCreated, setProjectCreated] = React.useState(false);
 
   useEffect(() => {
     if (isNewProject) {
       setProjectContext({ isNewProject: true });
       clearSelections();
+      setShowProvisions(false);
     } else if (projectId && currentProject) {
       loadProjectProvisions(projectId);
+      setShowProvisions(true);
     } else if (projectId && !currentProject) {
       // Project not found, redirect to projects list
       navigate('/');
@@ -32,6 +37,16 @@ export const ProvisionerPage: React.FC = () => {
       clearSelections();
     }
   };
+
+  const handleProjectCreated = (projectData: any) => {
+    console.log('Proyecto creado:', projectData);
+    setProjectCreated(true);
+    setShowProvisions(true);
+    // Here you would typically save the project to your backend
+    // For now, we'll just show the provisions section
+  };
+
+  const canShowProvisions = showProvisions && selectedStack;
 
   const getPageTitle = () => {
     if (isNewProject) return 'New Project Configuration';
@@ -94,11 +109,21 @@ export const ProvisionerPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left Column - Stack and Provisions */}
           <div className="lg:col-span-3 space-y-4">
+            {/* Project Creation Form - Only for new projects */}
+            {isNewProject && !projectCreated && (
+              <ProjectCreationForm onProjectCreated={handleProjectCreated} />
+            )}
+            
+            {/* Stack Picker - Always visible but disabled until project is created for new projects */}
             <StackPicker 
-              disabled={!isNewProject} 
+              disabled={!isNewProject ? true : (isNewProject && !projectCreated)} 
               lockedStack={currentProject?.stack}
             />
-            <ProvisionList />
+            
+            {/* Provision List - Only show when appropriate */}
+            {canShowProvisions && (
+              <ProvisionList />
+            )}
           </div>
           
           {/* Right Column - Summary Panel */}

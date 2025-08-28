@@ -4,6 +4,19 @@ export interface SelectedProvision {
   version?: string;
 }
 
+export interface ProjectData {
+  id: string;
+  name: string;
+  description: string;
+  projectType: string;
+  stack: string;
+  repository?: string;
+  branch: string;
+  status: 'active' | 'archived' | 'draft';
+  lastModified: string;
+  provisions: string[];
+}
+
 export interface PlanAction {
   type: 'ADD' | 'REMOVE' | 'UPDATE';
   item: string;
