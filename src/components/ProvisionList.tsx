@@ -90,10 +90,6 @@ export const ProvisionList: React.FC = () => {
     return failedImages.has(id) ? FALLBACK_ICON : (logos[id] || FALLBACK_ICON);
   };
 
-  const handleImageError = React.useCallback((id: string) => {
-    setFailedImages(prev => new Set(prev).add(id));
-  }, []);
-
   return (
     <div className="bg-white rounded-lg shadow-sm border p-3">
       <h3 className="text-lg font-medium text-gray-900 mb-3">Available Provisions</h3>
