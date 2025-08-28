@@ -91,24 +91,20 @@ export const ProvisionerPage: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* Stack Selection Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3">
-              <StackPicker 
-                disabled={!isNewProject} 
-                lockedStack={currentProject?.stack}
-              />
-            </div>
-            <div className="lg:col-span-1">
-              <SummaryPanel />
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Left Column - Stack and Provisions */}
+          <div className="lg:col-span-3 space-y-4">
+            <StackPicker 
+              disabled={!isNewProject} 
+              lockedStack={currentProject?.stack}
+            />
+            <ProvisionList />
           </div>
-
-          {/* Provisions Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-4">
-              <ProvisionList />
+          
+          {/* Right Column - Summary Panel */}
+          <div className="lg:col-span-1">
+            <div className="lg:sticky lg:top-8">
+              <SummaryPanel />
             </div>
           </div>
         </div>
