@@ -856,3 +856,8 @@ export const JiraIntegration: React.FC<JiraIntegrationProps> = ({ projectId }) =
     </div>
   );
 };
+const formatTrend = (trend: number) => {
+  if (trend > 0) return `+${trend}%`;
+  if (trend < 0) return `${trend}%`;
+  return `${trend}%`;
+};
