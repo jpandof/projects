@@ -14,7 +14,7 @@ function App() {
   return (
     <Router>
       <ErrorBoundary>
-        <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading...</div>}>
+        <Suspense fallback={null}>
           <Routes>
             <Route path="/" element={<ProjectsPage />} />
             <Route path="/apis" element={<APICatalogPage />} />
