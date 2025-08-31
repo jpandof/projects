@@ -1,22 +1,22 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ProjectList } from './components/ProjectList';
-import { ProvisionerPage } from './components/ProvisionerPage';
-import { ProjectOverview } from './components/ProjectOverview';
-import { ProjectMetrics } from './components/ProjectMetrics';
-import { APICatalog } from './components/APICatalog';
-import { CommunityPage } from './components/CommunityPage';
+import { ProjectsPage } from './pages/ProjectsPage';
+import { ProvisionerPage } from './pages/ProvisionerPage';
+import { ProjectOverviewPage } from './pages/ProjectOverviewPage';
+import { ProjectMetricsPage } from './pages/ProjectMetricsPage';
+import { APICatalogPage } from './pages/APICatalogPage';
+import { CommunityPage } from './pages/CommunityPage';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<ProjectList />} />
-        <Route path="/apis" element={<APICatalog />} />
+        <Route path="/" element={<ProjectsPage />} />
+        <Route path="/apis" element={<APICatalogPage />} />
         <Route path="/community" element={<CommunityPage />} />
         <Route path="/provisioner/:projectId" element={<ProvisionerPage />} />
-        <Route path="/project/:projectId" element={<ProjectOverview />} />
-        <Route path="/project/:projectId/metrics" element={<ProjectMetrics />} />
+        <Route path="/project/:projectId" element={<ProjectOverviewPage />} />
+        <Route path="/project/:projectId/metrics" element={<ProjectMetricsPage />} />
       </Routes>
     </Router>
   );
