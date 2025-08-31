@@ -11,6 +11,7 @@ import { AICodeReview } from './AICodeReview';
 import { ProductivityAnalytics } from './ProductivityAnalytics';
 import { JiraIntegration } from './JiraIntegration';
 import { NotificationCenter } from './NotificationCenter';
+import { ProjectDependencies } from './ProjectDependencies';
 import { mockProjects } from '../data/projects';
 import { stacks } from '../data/stacks';
 import { 
@@ -31,7 +32,8 @@ import {
   TestTube,
   Bot,
   Gauge,
-  ExternalLink
+  ExternalLink,
+  Package
 } from 'lucide-react';
 
 export const ProjectOverview: React.FC = () => {
@@ -40,6 +42,88 @@ export const ProjectOverview: React.FC = () => {
   
   const project = projectId ? mockProjects.find(p => p.id === projectId) : null;
   const stackInfo = project ? stacks.find(s => s.id === project.stack) : null;
+
+  // Function to update scroll indicators
+  const updateScrollIndicators = React.useCallback(() => {
+    const nav = document.getElementById('tab-navigation');
+    if (!nav) return;
+
+    const leftGradient = document.getElementById('left-gradient');
+    const rightGradient = document.getElementById('right-gradient');
+    const scrollLeft = document.getElementById('scroll-left');
+    const scrollRight = document.getElementById('scroll-right');
+    
+    const needsScroll = nav.scrollWidth > nav.clientWidth;
+    const isAtStart = nav.scrollLeft <= 10;
+    const isAtEnd = nav.scrollLeft >= nav.scrollWidth - nav.clientWidth - 10;
+    
+    // Show/hide elements based on scroll state
+    if (leftGradient) {
+      if (needsScroll && !isAtStart) {
+        leftGradient.style.display = 'block';
+        leftGradient.style.opacity = '1';
+      } else {
+        leftGradient.style.opacity = '0';
+        setTimeout(() => {
+          if (leftGradient.style.opacity === '0') {
+            leftGradient.style.display = 'none';
+          }
+        }, 300);
+      }
+    }
+    
+    if (rightGradient) {
+      if (needsScroll && !isAtEnd) {
+        rightGradient.style.display = 'block';
+        rightGradient.style.opacity = '1';
+      } else {
+        rightGradient.style.opacity = '0';
+        setTimeout(() => {
+          if (rightGradient.style.opacity === '0') {
+            rightGradient.style.display = 'none';
+          }
+        }, 300);
+      }
+    }
+    
+    if (scrollLeft) {
+      if (needsScroll && !isAtStart) {
+        scrollLeft.style.display = 'flex';
+        scrollLeft.style.opacity = '1';
+      } else {
+        scrollLeft.style.opacity = '0';
+        setTimeout(() => {
+          if (scrollLeft.style.opacity === '0') {
+            scrollLeft.style.display = 'none';
+          }
+        }, 300);
+      }
+    }
+    
+    if (scrollRight) {
+      if (needsScroll && !isAtEnd) {
+        scrollRight.style.display = 'flex';
+        scrollRight.style.opacity = '1';
+      } else {
+        scrollRight.style.opacity = '0';
+        setTimeout(() => {
+          if (scrollRight.style.opacity === '0') {
+            scrollRight.style.display = 'none';
+          }
+        }, 300);
+      }
+    }
+  }, []);
+
+  // Add resize listener
+  React.useEffect(() => {
+    const handleResize = () => {
+      setTimeout(updateScrollIndicators, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [updateScrollIndicators]);
 
   if (!project) {
     return (
@@ -72,6 +156,7 @@ export const ProjectOverview: React.FC = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
+    { id: 'dependencies', label: 'Dependencies', icon: Package },
     { id: 'environments', label: 'Environments', icon: Server },
     { id: 'deployments', label: 'Deployments', icon: Rocket },
     { id: 'logs', label: 'Logs', icon: FileText },
@@ -86,6 +171,8 @@ export const ProjectOverview: React.FC = () => {
 
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'dependencies':
+        return <ProjectDependencies projectId={projectId!} />;
       case 'environments':
         return <ProjectEnvironments projectId={projectId!} />;
       case 'deployments':
@@ -302,16 +389,56 @@ export const ProjectOverview: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
           {/* Navigation Tabs */}
-          <div className="bg-white rounded-lg shadow-sm border">
-            <div className="border-b border-gray-200">
-              <nav className="flex space-x-8 px-6">
+          <div className="bg-white rounded-lg shadow-sm border" ref={(el) => {
+            if (el) {
+              // Check scroll necessity after component mounts
+              setTimeout(() => {
+                updateScrollIndicators();
+              }, 100);
+            }
+          }}>
+            <div className="border-b border-gray-200 overflow-hidden relative">
+              {/* Left gradient indicator */}
+              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none hidden transition-opacity duration-300" id="left-gradient"></div>
+              
+              {/* Right gradient indicator */}
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none hidden transition-opacity duration-300" id="right-gradient"></div>
+              
+              {/* Navigation arrows */}
+              <button 
+                id="scroll-left"
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 z-20 w-6 h-6 bg-white border border-gray-300 rounded-full shadow-sm items-center justify-center transition-opacity duration-300 hover:bg-gray-50 hidden"
+                onClick={() => {
+                  const nav = document.getElementById('tab-navigation');
+                  if (nav) nav.scrollBy({ left: -200, behavior: 'smooth' });
+                }}
+              >
+                <span className="text-gray-600 text-sm">‹</span>
+              </button>
+              
+              <button 
+                id="scroll-right"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 z-20 w-6 h-6 bg-white border border-gray-300 rounded-full shadow-sm items-center justify-center transition-opacity duration-300 hover:bg-gray-50 hidden"
+                onClick={() => {
+                  const nav = document.getElementById('tab-navigation');
+                  if (nav) nav.scrollBy({ left: 200, behavior: 'smooth' });
+                }}
+              >
+                <span className="text-gray-600 text-sm">›</span>
+              </button>
+              
+              <nav 
+                id="tab-navigation"
+                className="flex space-x-6 px-6 overflow-x-auto scrollbar-hide min-w-full"
+                onScroll={updateScrollIndicators}
+              >
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
-                      className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                      className={`flex items-center space-x-2 py-4 px-3 border-b-2 font-medium text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
                         activeTab === tab.id
                           ? 'border-blue-500 text-blue-600'
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'

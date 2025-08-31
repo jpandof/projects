@@ -13,7 +13,9 @@ import {
   FileText,
   Settings,
   Trash2,
-  Activity
+  Activity,
+  Globe,
+  Users
 } from 'lucide-react';
 
 export const ProjectList: React.FC = () => {
@@ -70,6 +72,20 @@ export const ProjectList: React.FC = () => {
               >
                 <Plus className="h-4 w-4" />
                 <span>New Project</span>
+              </Link>
+              <Link
+                to="/apis"
+                className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                <Globe className="h-4 w-4" />
+                <span>APIs</span>
+              </Link>
+              <Link
+                to="/community"
+                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Users className="h-4 w-4" />
+                <span>Community</span>
               </Link>
               <NotificationCenter />
             </div>
@@ -167,17 +183,17 @@ export const ProjectList: React.FC = () => {
                   <div className="flex space-x-2">
                     <Link
                       to={`/provisioner/${project.id}`}
-                      className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex items-center justify-center px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                      title="Configure project provisions"
                     >
                       <Settings className="h-4 w-4" />
-                      <span>Configure</span>
                     </Link>
                     <Link
                       to={`/project/${project.id}`}
-                      className="flex items-center justify-center px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-                      title="View project overview"
+                      className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       <Activity className="h-4 w-4" />
+                      <span>View Project</span>
                     </Link>
                     {project.status === 'active' && (
                       <div className="relative group">
@@ -212,6 +228,13 @@ export const ProjectList: React.FC = () => {
             >
               <Plus className="h-4 w-4" />
               <span>Create New Project</span>
+            </Link>
+            <Link
+              to="/community"
+              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Users className="h-4 w-4" />
+              <span>Community</span>
             </Link>
           </div>
         )}
