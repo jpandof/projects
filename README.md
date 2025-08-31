@@ -26,3 +26,14 @@ Scripts
 - npm run build: production build
 - npm run preview: preview production build
 - npm run lint: run ESLint
+
+
+Enhancements
+- Lazy loading: Route-level pages are now code-split using React.lazy and Suspense in src/App.tsx to reduce initial bundle size and improve first load performance.
+- Not Found page: A 404 fallback route has been added and implemented at src/pages/NotFoundPage.tsx.
+
+How lazy loading is wired
+- In src/App.tsx, each page is imported via dynamic import. Since pages export named components, we map them to default:
+  const ProjectsPage = lazy(() => import('./pages/ProjectsPage').then(m => ({ default: m.ProjectsPage })));
+- A Suspense fallback with a lightweight loader wraps <Routes>.
+- A catch-all route <Route path="*" element={<NotFoundPage />} /> ensures unknown URLs show a friendly 404.
