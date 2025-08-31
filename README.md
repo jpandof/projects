@@ -37,3 +37,13 @@ How lazy loading is wired
   const ProjectsPage = lazy(() => import('./pages/ProjectsPage').then(m => ({ default: m.ProjectsPage })));
 - A Suspense fallback with a lightweight loader wraps <Routes>.
 - A catch-all route <Route path="*" element={<NotFoundPage />} /> ensures unknown URLs show a friendly 404.
+
+
+Error handling
+- A global ErrorBoundary (src/components/ErrorBoundary.tsx) now wraps the app routes in src/App.tsx. If a render error occurs, users see a friendly fallback with “Try again” and “Go to Home”. In development, the error stack is shown to aid debugging.
+
+Next suggestions (pick your priority)
+- Bundle insights: add vite-bundle-visualizer and/or configure build.rollupOptions.output.manualChunks for better chunking to reduce the warning about large chunks.
+- Shared Layout: extract common header into a layout route to avoid duplication across pages.
+- i18n: introduce a lightweight i18n setup (e.g., react-i18next) to toggle EN/ES; many strings are already in inglés/español.
+- Dark mode: enable Tailwind dark mode and add a simple theme toggle.
