@@ -240,5 +240,87 @@ export const mockDeployments: Deployment[] = [
       'Rolling back deployment...',
       'Deployment failed!'
     ]
+  },
+  {
+    id: 'deploy-004',
+    projectId: 'proj-001',
+    environment: 'testing',
+    status: 'success',
+    branch: 'develop',
+    commit: 'm3n4o5p6',
+    commitMessage: 'Test: New checkout flow validation',
+    author: 'sarah.jones@company.com',
+    startedAt: '2024-01-15T12:30:00Z',
+    completedAt: '2024-01-15T12:34:20Z',
+    duration: 260,
+    logs: ['Deployment completed successfully!']
+  },
+  {
+    id: 'deploy-005',
+    projectId: 'proj-002',
+    environment: 'staging',
+    status: 'success',
+    branch: 'release/2.1.0',
+    commit: 'q7r8s9t0',
+    commitMessage: 'Pre: Prepare release 2.1.0',
+    author: 'mike.wilson@company.com',
+    startedAt: '2024-01-15T10:15:00Z',
+    completedAt: '2024-01-15T10:19:45Z',
+    duration: 285,
+    logs: ['Deployment completed successfully!']
+  },
+  {
+    id: 'deploy-006',
+    projectId: 'proj-002',
+    environment: 'testing',
+    status: 'success',
+    branch: 'develop',
+    commit: 'u1v2w3x4',
+    commitMessage: 'Test: API rate limiting implementation',
+    author: 'jane.smith@company.com',
+    startedAt: '2024-01-15T09:00:00Z',
+    completedAt: '2024-01-15T09:03:30Z',
+    duration: 210,
+    logs: ['Deployment completed successfully!']
+  },
+  {
+    id: 'deploy-007',
+    projectId: 'proj-003',
+    environment: 'production',
+    status: 'success',
+    branch: 'main',
+    commit: 'y5z6a7b8',
+    commitMessage: 'Fix: Dashboard rendering optimization',
+    author: 'alex.kumar@company.com',
+    startedAt: '2024-01-14T16:00:00Z',
+    completedAt: '2024-01-14T16:04:15Z',
+    duration: 255,
+    logs: ['Deployment completed successfully!']
+  },
+  {
+    id: 'deploy-008',
+    projectId: 'proj-003',
+    environment: 'staging',
+    status: 'success',
+    branch: 'develop',
+    commit: 'c9d0e1f2',
+    commitMessage: 'Feature: Real-time data streaming',
+    author: 'alex.kumar@company.com',
+    startedAt: '2024-01-15T14:45:00Z',
+    completedAt: '2024-01-15T14:49:30Z',
+    duration: 270,
+    logs: ['Deployment completed successfully!']
+  },
+  {
+    id: 'deploy-009',
+    projectId: 'proj-003',
+    environment: 'testing',
+    status: 'running',
+    branch: 'feature/streaming',
+    commit: 'g3h4i5j6',
+    commitMessage: 'WIP: Testing streaming infrastructure',
+    author: 'alex.kumar@company.com',
+    startedAt: '2024-01-15T15:35:00Z',
+    logs: ['Currently deploying...']
   }
 ];

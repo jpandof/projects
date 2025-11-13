@@ -12,6 +12,7 @@ import { ProductivityAnalytics } from '../components/ProductivityAnalytics';
 import { JiraIntegration } from '../components/JiraIntegration';
 import { NotificationCenter } from '../components/NotificationCenter';
 import { ProjectDependencies } from '../components/ProjectDependencies';
+import { ProjectQuickDeploy } from '../components/ProjectQuickDeploy';
 import { mockProjects } from '../data/projects';
 import { stacks } from '../data/stacks';
 import { 
@@ -239,6 +240,9 @@ export const ProjectOverviewPage: React.FC = () => {
                 </div>
               </div>
             </div>
+            {/* Quick Deploy Component */}
+            <ProjectQuickDeploy projectId={projectId!} projectName={project.name} />
+
 
             {/* Project Details */}
             <div className="bg-white rounded-lg shadow-sm border p-6">
