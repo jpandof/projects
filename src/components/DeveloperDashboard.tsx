@@ -17,7 +17,12 @@ import {
 import { mockDeployments } from '../data/environments';
 import { ScheduledDeploymentsList } from './ScheduledDeploymentsList';
 import { RecentDeploymentsList } from './RecentDeploymentsList';
+import { PipelineFlow } from './PipelineFlow';
 import { KPISkeleton } from './KPISkeleton';
+import { DeploymentCardSkeleton } from './DeploymentCardSkeleton';
+import { ScheduledDeploymentsListSkeleton } from './ScheduledDeploymentsListSkeleton';
+import { RecentDeploymentsListSkeleton } from './RecentDeploymentsListSkeleton';
+import { EnvironmentStatusSkeleton } from './EnvironmentStatusSkeleton';
 import type { ScheduledDeployment } from './ProjectDeployments';
 
 interface DeveloperDashboardProps {
@@ -67,6 +72,14 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
     prReviewTime: { avgHours: 0, pending: 0 },
     codeQuality: { score: 0 },
     testCoverage: { coverage: 0 },
+  });
+
+  // Estados de carga para otros componentes
+  const [loadingComponents, setLoadingComponents] = useState({
+    lastDeployment: true,
+    scheduledDeployments: true,
+    recentDeployments: true,
+    environments: true,
   });
 
   // Filtrar despliegues del usuario actual (solo el último)
@@ -177,6 +190,38 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
       }));
       setLoadingKPIs(prev => ({ ...prev, testCoverage: false }));
     }, 1400);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  // Simular carga de Último Despliegue (500ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingComponents(prev => ({ ...prev, lastDeployment: false }));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  // Simular carga de Despliegues Programados (700ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingComponents(prev => ({ ...prev, scheduledDeployments: false }));
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  // Simular carga de Despliegues Recientes (900ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingComponents(prev => ({ ...prev, recentDeployments: false }));
+    }, 900);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  // Simular carga de Estado de Ambientes (1100ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingComponents(prev => ({ ...prev, environments: false }));
+    }, 1100);
     return () => clearTimeout(timer);
   }, [projectId]);
 
@@ -474,8 +519,11 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
       </div>
 
       {/* Mi Último Despliegue - Expandible */}
-      {myDeployments.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      {loadingComponents.lastDeployment ? (
+        <DeploymentCardSkeleton />
+      ) : (
+        myDeployments.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           {(() => {
             const deployment = myDeployments[0]; // Solo el último
             const statusConfig = {
@@ -674,6 +722,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
             );
           })()}
         </div>
+        )
       )}
 
       {/* Main Grid: Deploy Panel (Left) + Logs & Environments (Right) */}
@@ -844,58 +893,70 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
           {/* Deployments Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white rounded-lg shadow-sm border p-4">
-              <ScheduledDeploymentsList
-                deployments={scheduledDeployments}
-                projectId={projectId}
-                onReschedule={handleRescheduleDeployment}
-                onCancel={handleCancelDeployment}
-              />
+              {loadingComponents.scheduledDeployments ? (
+                <ScheduledDeploymentsListSkeleton />
+              ) : (
+                <ScheduledDeploymentsList
+                  deployments={scheduledDeployments}
+                  projectId={projectId}
+                  onReschedule={handleRescheduleDeployment}
+                  onCancel={handleCancelDeployment}
+                />
+              )}
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-4">
-              <RecentDeploymentsList
-                deployments={mockDeployments}
-                projectId={projectId}
-              />
+              {loadingComponents.recentDeployments ? (
+                <RecentDeploymentsListSkeleton />
+              ) : (
+                <RecentDeploymentsList
+                  deployments={mockDeployments}
+                  projectId={projectId}
+                />
+              )}
             </div>
           </div>
         </div>
 
-        {/* Right Column: Logs + Environments (1/3) */}
+        {/* Right Column: Environments (1/3) */}
         <div className="space-y-4">
           {/* Environment Status */}
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center space-x-2">
-              <Server className="h-4 w-4 text-blue-600" />
-              <span>Estado de Ambientes</span>
-            </h3>
+          {loadingComponents.environments ? (
+            <EnvironmentStatusSkeleton />
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm border p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center space-x-2">
+                <Server className="h-4 w-4 text-blue-600" />
+                <span>Estado de Ambientes</span>
+              </h3>
 
-            <div className="space-y-2">
-              {environmentsStatus.map((env) => (
-                <div key={env.name} className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-sm text-gray-900">{env.name}</span>
-                    <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${getStatusColor(env.status)}`}>
-                      {env.status === 'healthy' ? '✓' : '⚠'}
-                    </span>
+              <div className="space-y-2">
+                {environmentsStatus.map((env) => (
+                  <div key={env.name} className="p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-sm text-gray-900">{env.name}</span>
+                      <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${getStatusColor(env.status)}`}>
+                        {env.status === 'healthy' ? '✓' : '⚠'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-600 space-y-0.5">
+                      <div className="flex justify-between">
+                        <span>Version:</span>
+                        <span className="font-mono font-medium">{env.version}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Uptime:</span>
+                        <span className="font-medium">{env.uptime}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Response:</span>
+                        <span className="font-medium">{env.responseTime}ms</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-600 space-y-0.5">
-                    <div className="flex justify-between">
-                      <span>Version:</span>
-                      <span className="font-mono font-medium">{env.version}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Uptime:</span>
-                      <span className="font-medium">{env.uptime}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Response:</span>
-                      <span className="font-medium">{env.responseTime}ms</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
