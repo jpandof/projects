@@ -20,84 +20,146 @@ export const ScheduledDeploymentsList: React.FC<ScheduledDeploymentsListProps> =
     .sort((a, b) => new Date(a.scheduledFor).getTime() - new Date(b.scheduledFor).getTime())
     .slice(0, 5);
 
+  // Función para obtener iniciales del nombre
+  const getInitials = (email: string) => {
+    const name = email.split('@')[0];
+    const parts = name.split('.');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  // Función para obtener color del avatar basado en email
+  const getAvatarColor = (email: string) => {
+    const colors = [
+      'bg-blue-500',
+      'bg-green-500',
+      'bg-purple-500',
+      'bg-pink-500',
+      'bg-indigo-500',
+      'bg-yellow-500',
+      'bg-red-500',
+      'bg-teal-500',
+    ];
+    const index = email.length % colors.length;
+    return colors[index];
+  };
+
   return (
     <div>
-      <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center space-x-2">
-        <Calendar className="h-4 w-4 text-blue-600" />
-        <span>Despliegues Programados ({deployments.filter(d => d.projectId === projectId && d.status === 'scheduled').length})</span>
+      <h4 className="text-xs font-semibold text-gray-900 mb-2 flex items-center space-x-1.5">
+        <Calendar className="h-3.5 w-3.5 text-blue-600" />
+        <span>Programados ({deployments.filter(d => d.projectId === projectId && d.status === 'scheduled').length})</span>
       </h4>
 
-      <div className="border rounded-lg overflow-hidden bg-white">
-        {/* Header */}
-        <div className="grid grid-cols-[60px,1fr,80px,70px] gap-2 p-2 bg-gray-50 border-b text-xs font-semibold text-gray-600">
-          <div>Env</div>
-          <div>Branch</div>
-          <div>Tiempo</div>
-          <div>Acción</div>
-        </div>
-
-        {/* Rows */}
+      <div className="space-y-1.5">
         {filteredDeployments.length > 0 ? (
           filteredDeployments.map((deployment) => {
             const scheduledDate = new Date(deployment.scheduledFor);
             const now = new Date();
-            const diff = scheduledDate.getTime() - now.getTime();
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const isToday = scheduledDate.toDateString() === now.toDateString();
+            const isTomorrow = scheduledDate.toDateString() === new Date(now.getTime() + 24 * 60 * 60 * 1000).toDateString();
 
-            let timeUntil = '';
-            let isOverdue = false;
+            // Calcular días de diferencia
+            const daysDiff = Math.floor((scheduledDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
-            if (diff < 0) {
-              timeUntil = 'Vencido';
-              isOverdue = true;
-            } else if (hours > 24) {
-              const days = Math.floor(hours / 24);
-              timeUntil = `${days}d ${hours % 24}h`;
-            } else if (hours > 0) {
-              timeUntil = `${hours}h ${minutes}m`;
+            // Formato de día compacto
+            let dayLabel = '';
+            if (isToday) {
+              dayLabel = 'Hoy';
+            } else if (isTomorrow) {
+              dayLabel = 'Mañana';
+            } else if (daysDiff <= 7) {
+              // Días cercanos: solo día de semana
+              dayLabel = scheduledDate.toLocaleDateString('es-ES', { weekday: 'short' });
             } else {
-              timeUntil = `${minutes}m`;
+              // Días lejanos: fecha corta
+              dayLabel = scheduledDate.toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'short'
+              });
             }
 
             return (
-              <div key={deployment.id} className="grid grid-cols-[60px,1fr,80px,70px] gap-2 p-2 hover:bg-gray-50 transition-colors border-b last:border-b-0 items-center">
-                <span className="px-1.5 py-0.5 text-xs font-bold rounded bg-blue-600 text-white text-center">
-                  {deployment.environment}
-                </span>
-                <div className="min-w-0">
-                  <div className="font-mono text-xs text-gray-700 truncate">{deployment.branch}</div>
-                  <div className="text-xs text-gray-400">
-                    {scheduledDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+              <div key={deployment.id} className="bg-white border border-gray-200 rounded px-2 py-1.5 hover:border-blue-300 transition-colors">
+                <div className="flex items-center justify-between gap-1.5">
+                  {/* Info del deploy */}
+                  <div className="flex-1 min-w-0 flex items-center gap-1.5">
+                    <span
+                      className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-blue-600 text-white flex-shrink-0 cursor-help"
+                      title={`Entorno: ${deployment.environment}\n${deployment.autoRollback ? '✓ Auto-rollback activado' : '✗ Sin auto-rollback'}`}
+                    >
+                      {deployment.environment}
+                    </span>
+                    <span
+                      className="font-mono text-[10px] text-gray-700 truncate cursor-help"
+                      title={`Branch: ${deployment.branch}\nDescripción: ${deployment.description}`}
+                    >
+                      {deployment.branch}
+                    </span>
                   </div>
-                </div>
-                <span className={`px-1.5 py-0.5 text-xs font-bold rounded text-center ${
-                  isOverdue ? 'bg-red-600 text-white' : 'bg-blue-100 text-blue-700'
-                }`}>
-                  {timeUntil}
-                </span>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => onReschedule?.(deployment.id)}
-                    className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                    title="Replanificar"
-                  >
-                    <Calendar className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => onCancel?.(deployment.id)}
-                    className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-                    title="Cancelar"
-                  >
-                    <XCircle className="h-3.5 w-3.5" />
-                  </button>
+
+                  {/* Fecha, hora y avatar en línea */}
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <span
+                      className="text-[10px] text-gray-600 font-medium cursor-help"
+                      title={`Día: ${scheduledDate.toLocaleDateString('es-ES', { 
+                        weekday: 'long', 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric' 
+                      })}`}
+                    >
+                      {dayLabel}
+                    </span>
+                    <span
+                      className="text-[10px] font-bold text-blue-600 cursor-help"
+                      title={`Hora programada: ${scheduledDate.toLocaleTimeString('es-ES', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}\nFecha completa: ${scheduledDate.toLocaleString('es-ES')}`}
+                    >
+                      {scheduledDate.toLocaleTimeString('es-ES', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+
+                    {/* Avatar mini */}
+                    <div
+                      className={`w-5 h-5 rounded-full ${getAvatarColor(deployment.createdBy)} flex items-center justify-center flex-shrink-0 cursor-help`}
+                      title={`Programado por: ${deployment.createdBy}\nCreado: ${new Date(deployment.createdAt).toLocaleString('es-ES')}\n${deployment.notifyOnComplete ? '🔔 Notificaciones activas' : '🔕 Sin notificaciones'}`}
+                    >
+                      <span className="text-[8px] font-bold text-white">
+                        {getInitials(deployment.createdBy)}
+                      </span>
+                    </div>
+
+                    {/* Botones mini */}
+                    <button
+                      onClick={() => onReschedule?.(deployment.id)}
+                      className="p-0.5 text-blue-600 hover:bg-blue-50 rounded"
+                      title="Reprogramar despliegue\nClick para cambiar la fecha y hora"
+                    >
+                      <Calendar className="h-3 w-3" />
+                    </button>
+                    <button
+                      onClick={() => onCancel?.(deployment.id)}
+                      className="p-0.5 text-red-600 hover:bg-red-50 rounded"
+                      title="Cancelar despliegue\nEsta acción no se puede deshacer"
+                    >
+                      <XCircle className="h-3 w-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
           })
         ) : (
-          <div className="text-center py-4">
-            <p className="text-xs text-gray-500">No hay programados</p>
+          <div className="text-center py-3 bg-gray-50 rounded border border-dashed border-gray-300">
+            <p className="text-[10px] text-gray-500">Sin programaciones</p>
           </div>
         )}
       </div>

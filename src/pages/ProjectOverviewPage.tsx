@@ -23,17 +23,17 @@ import type { ScheduledDeployment } from '../components/ProjectDeployments';
 
 // Mock data para despliegues programados
 const mockScheduledDeployments: ScheduledDeployment[] = [
-  // Despliegues programados por el usuario actual
+  // Despliegues programados por el usuario actual - Hoy y próximos días
   {
     id: 'sched-current-1',
     projectId: 'proj-001',
     environment: 'TST',
     branch: 'develop',
-    scheduledFor: '2026-01-17T14:00:00Z',
+    scheduledFor: '2026-01-16T22:00:00Z', // Hoy a las 22:00
     status: 'scheduled',
     createdBy: 'current.user@example.com',
     createdAt: '2026-01-16T09:00:00Z',
-    description: 'Deploy de prueba a TST',
+    description: 'Deploy nocturno a TST',
     autoRollback: false,
     notifyOnComplete: true
   },
@@ -42,7 +42,7 @@ const mockScheduledDeployments: ScheduledDeployment[] = [
     projectId: 'proj-001',
     environment: 'PRE',
     branch: 'hotfix/urgent-fix',
-    scheduledFor: '2026-01-18T18:30:00Z',
+    scheduledFor: '2026-01-17T10:30:00Z', // Mañana por la mañana
     status: 'scheduled',
     createdBy: 'current.user@example.com',
     createdAt: '2026-01-16T11:00:00Z',
@@ -55,38 +55,38 @@ const mockScheduledDeployments: ScheduledDeployment[] = [
     projectId: 'proj-001',
     environment: 'PRO',
     branch: 'release/v2.1.0',
-    scheduledFor: '2026-01-20T10:00:00Z',
+    scheduledFor: '2026-01-20T08:00:00Z', // Lunes próximo
     status: 'scheduled',
     createdBy: 'current.user@example.com',
     createdAt: '2026-01-16T10:00:00Z',
-    description: 'Release programado a producción v2.1.0',
+    description: 'Release v2.1.0 a producción',
     autoRollback: true,
     notifyOnComplete: true
   },
-  // Proyecto 1 - proj-001
+  // Proyecto 1 - Otros despliegues programados
   {
-    id: 'sched-example-1',
+    id: 'sched-eden-1',
     projectId: 'proj-001',
-    environment: 'PRO',
-    branch: 'release/v2.1.0',
-    scheduledFor: '2026-01-20T10:00:00Z',
+    environment: 'EDEN',
+    branch: 'feature/new-dashboard',
+    scheduledFor: '2026-01-16T18:00:00Z', // Hoy tarde
     status: 'scheduled',
-    createdBy: 'john.doe@example.com',
-    createdAt: '2026-01-16T10:00:00Z',
-    description: 'Release a producción v2.1.0',
-    autoRollback: true,
+    createdBy: 'dev@example.com',
+    createdAt: '2026-01-16T08:00:00Z',
+    description: 'Testing nuevo dashboard',
+    autoRollback: false,
     notifyOnComplete: true
   },
   {
     id: 'sched-tst-1',
     projectId: 'proj-001',
     environment: 'TST',
-    branch: 'develop',
-    scheduledFor: '2026-01-17T14:00:00Z',
+    branch: 'feature/api-improvements',
+    scheduledFor: '2026-01-17T15:00:00Z', // Mañana tarde
     status: 'scheduled',
-    createdBy: 'dev@example.com',
-    createdAt: '2026-01-16T09:00:00Z',
-    description: 'Deploy a TST',
+    createdBy: 'jane.smith@example.com',
+    createdAt: '2026-01-16T09:30:00Z',
+    description: 'Mejoras de API a TST',
     autoRollback: false,
     notifyOnComplete: true
   },
@@ -94,26 +94,52 @@ const mockScheduledDeployments: ScheduledDeployment[] = [
     id: 'sched-pre-1',
     projectId: 'proj-001',
     environment: 'PRE',
-    branch: 'hotfix/urgent-fix',
-    scheduledFor: '2026-01-18T18:30:00Z',
+    branch: 'release/v2.0.5',
+    scheduledFor: '2026-01-19T12:00:00Z', // Domingo mediodía
     status: 'scheduled',
     createdBy: 'dev@example.com',
     createdAt: '2026-01-16T11:00:00Z',
-    description: 'Hotfix a PRE',
+    description: 'Release menor a PRE',
     autoRollback: true,
     notifyOnComplete: true
   },
   {
-    id: 'sched-eden-1',
+    id: 'sched-pro-1',
     projectId: 'proj-001',
-    environment: 'EDEN',
-    branch: 'feature/new-feature',
-    scheduledFor: '2026-01-17T09:00:00Z',
+    environment: 'PRO',
+    branch: 'hotfix/security-patch',
+    scheduledFor: '2026-01-17T02:00:00Z', // Mañana madrugada
     status: 'scheduled',
-    createdBy: 'dev@example.com',
-    createdAt: '2026-01-16T08:00:00Z',
-    description: 'Testing nueva feature',
-    autoRollback: false,
+    createdBy: 'admin@example.com',
+    createdAt: '2026-01-16T14:00:00Z',
+    description: 'Parche de seguridad urgente',
+    autoRollback: true,
+    notifyOnComplete: true
+  },
+  {
+    id: 'sched-future-1',
+    projectId: 'proj-001',
+    environment: 'PRO',
+    branch: 'release/v3.0.0',
+    scheduledFor: '2026-01-25T09:00:00Z', // En 9 días
+    status: 'scheduled',
+    createdBy: 'current.user@example.com',
+    createdAt: '2026-01-16T15:00:00Z',
+    description: 'Release mayor v3.0.0',
+    autoRollback: true,
+    notifyOnComplete: true
+  },
+  {
+    id: 'sched-future-2',
+    projectId: 'proj-001',
+    environment: 'PRE',
+    branch: 'release/v2.5.0',
+    scheduledFor: '2026-01-22T14:30:00Z', // En 6 días
+    status: 'scheduled',
+    createdBy: 'jane.smith@example.com',
+    createdAt: '2026-01-16T16:00:00Z',
+    description: 'Testing release v2.5.0',
+    autoRollback: true,
     notifyOnComplete: true
   },
   // Proyecto 2 - proj-002
