@@ -666,7 +666,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                 <span>Despliegue Rápido</span>
               </h3>
               {isDeploying && (
-                <span className="px-3 py-1 bg-slate-100 text-slate-700 text-sm rounded-full font-medium flex items-center space-x-2">
+                <span className="px-3 py-1 bg-white border border-gray-300 text-gray-700 text-sm rounded-full font-medium flex items-center space-x-2 shadow-sm">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Desplegando...</span>
                 </span>
@@ -750,18 +750,18 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
             </div>
 
             {showScheduleSuccess && (
-              <div className="mt-3 bg-emerald-50 border-l-4 border-emerald-500 rounded p-2.5 flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
-                <p className="text-xs text-emerald-900 font-medium">
+              <div className="mt-3 bg-white border border-gray-300 rounded p-2.5 flex items-center space-x-2 shadow-sm">
+                <CheckCircle className="h-4 w-4 text-gray-600 flex-shrink-0" />
+                <p className="text-xs text-gray-700 font-medium">
                   ✓ Programado: <strong>{selectedBranch}</strong> → <strong>{selectedEnvironment}</strong> el {new Date(scheduledDateTime).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
             )}
 
             {selectedEnvironment === 'PRO' && (
-              <div className="mt-3 bg-amber-50 border-l-4 border-amber-500 rounded p-2 flex items-center space-x-2">
-                <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                <p className="text-xs text-amber-900 font-medium">
+              <div className="mt-3 bg-white border border-gray-300 rounded p-2 flex items-center space-x-2 shadow-sm">
+                <AlertTriangle className="h-4 w-4 text-gray-600 flex-shrink-0" />
+                <p className="text-xs text-gray-700 font-medium">
                   <strong>Producción:</strong> Asegúrate de que los cambios han sido probados en PRE.
                 </p>
               </div>
