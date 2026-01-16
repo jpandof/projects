@@ -21,6 +21,7 @@ import { DeploymentCardSkeleton } from './DeploymentCardSkeleton';
 import { ScheduledDeploymentsListSkeleton } from './ScheduledDeploymentsListSkeleton';
 import { RecentDeploymentsListSkeleton } from './RecentDeploymentsListSkeleton';
 import { EnvironmentStatusSkeleton } from './EnvironmentStatusSkeleton';
+import { KPICard } from './KPICard';
 import type { ScheduledDeployment } from './ProjectDeployments';
 
 interface DeveloperDashboardProps {
@@ -228,10 +229,10 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
 
   // Entornos disponibles
   const environments = [
-    { value: 'EDEN', label: 'EDEN', color: 'bg-blue-600' },
-    { value: 'TST', label: 'TST', color: 'bg-green-600' },
-    { value: 'PRE', label: 'PRE', color: 'bg-yellow-600' },
-    { value: 'PRO', label: 'PRO', color: 'bg-red-600' }
+    { value: 'EDEN', label: 'EDEN', color: 'bg-slate-500' },
+    { value: 'TST', label: 'TST', color: 'bg-slate-600' },
+    { value: 'PRE', label: 'PRE', color: 'bg-slate-700' },
+    { value: 'PRO', label: 'PRO', color: 'bg-slate-800' }
   ];
 
   // Función para ejecutar despliegue inmediato
@@ -350,11 +351,11 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
       case 'pending':
         return <div className="w-5 h-5 rounded-full border-2 border-gray-300"></div>;
       case 'running':
-        return <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />;
+        return <Loader2 className="h-5 w-5 text-slate-600 animate-spin" />;
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return <CheckCircle className="h-5 w-5 text-slate-700" />;
       case 'failed':
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return <XCircle className="h-5 w-5 text-slate-500" />;
       case 'skipped':
         return <div className="w-5 h-5 rounded-full border-2 border-gray-200 bg-gray-100"></div>;
     }
@@ -386,196 +387,64 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
       {/* Header Stats - Métricas de Despliegue y Calidad */}
       <div className="grid grid-cols-6 gap-3">
         {/* Tiempo de Despliegue */}
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Tiempo Deploy</p>
-            <Clock className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            {loadingKPIs.deployTime ? (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
-                  <p className="text-[10px] opacity-75">avg</p>
-                </div>
-                <div className="flex items-center space-x-1.5 text-[10px] opacity-90">
-                  <div className="h-3 w-10 bg-white/20 rounded animate-pulse"></div>
-                  <span>•</span>
-                  <div className="h-3 w-10 bg-white/20 rounded animate-pulse"></div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <p className="text-xl font-bold">{Math.floor(kpiData.deployTime.avg / 60)}m</p>
-                  <p className="text-[10px] opacity-75">avg</p>
-                </div>
-                <div className="flex items-center space-x-1.5 text-[10px] opacity-90">
-                  <span>↓ {Math.floor(kpiData.deployTime.min / 60)}m</span>
-                  <span>•</span>
-                  <span>↑ {Math.floor(kpiData.deployTime.max / 60)}m</span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+        <KPICard
+          title="Tiempo Deploy"
+          icon={Clock}
+          isLoading={loadingKPIs.deployTime}
+          mainValue={`${Math.floor(kpiData.deployTime.avg / 60)}m`}
+          mainUnit="avg"
+          secondaryValue={`↓ ${Math.floor(kpiData.deployTime.min / 60)}m • ↑ ${Math.floor(kpiData.deployTime.max / 60)}m`}
+        />
 
         {/* Success Rate */}
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Success Rate</p>
-            <CheckCircle className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            {loadingKPIs.successRate ? (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
-                  <p className="text-[10px] opacity-75">ok</p>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  <div className="h-3 w-16 bg-white/20 rounded animate-pulse"></div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <p className="text-xl font-bold">{kpiData.successRate.rate}%</p>
-                  <p className="text-[10px] opacity-75">ok</p>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  {kpiData.successRate.successful}/{kpiData.successRate.total} deploys
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+        <KPICard
+          title="Success Rate"
+          icon={CheckCircle}
+          isLoading={loadingKPIs.successRate}
+          mainValue={`${kpiData.successRate.rate}%`}
+          mainUnit="ok"
+          secondaryValue={`${kpiData.successRate.successful}/${kpiData.successRate.total} deploys`}
+        />
 
         {/* Deploy Frequency */}
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Deploy Frequency</p>
-            <Rocket className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            {loadingKPIs.deployFrequency ? (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
-                  <p className="text-[10px] opacity-75">/día</p>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  <div className="h-3 w-20 bg-white/20 rounded animate-pulse"></div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <p className="text-xl font-bold">{kpiData.deployFrequency.frequency}</p>
-                  <p className="text-[10px] opacity-75">/día</p>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  {kpiData.deployFrequency.count} última semana
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+        <KPICard
+          title="Deploy Frequency"
+          icon={Rocket}
+          isLoading={loadingKPIs.deployFrequency}
+          mainValue={kpiData.deployFrequency.frequency}
+          mainUnit="/día"
+          secondaryValue={`${kpiData.deployFrequency.count} última semana`}
+        />
 
         {/* PR Review Time */}
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">PR Review Time</p>
-            <Activity className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            {loadingKPIs.prReviewTime ? (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
-                  <p className="text-[10px] opacity-75">avg</p>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  <div className="h-3 w-20 bg-white/20 rounded animate-pulse"></div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <p className="text-xl font-bold">{kpiData.prReviewTime.avgHours}h</p>
-                  <p className="text-[10px] opacity-75">avg</p>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  {kpiData.prReviewTime.pending} PRs pendientes
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+        <KPICard
+          title="PR Review Time"
+          icon={Activity}
+          isLoading={loadingKPIs.prReviewTime}
+          mainValue={`${kpiData.prReviewTime.avgHours}h`}
+          mainUnit="avg"
+          secondaryValue={`${kpiData.prReviewTime.pending} PRs pendientes`}
+        />
 
         {/* Code Quality */}
-        <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Code Quality</p>
-            <Server className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            {loadingKPIs.codeQuality ? (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <div className="h-7 w-8 bg-white/20 rounded animate-pulse"></div>
-                  <div className="h-3 w-12 bg-white/20 rounded animate-pulse"></div>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  SonarQube
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <p className="text-xl font-bold">
-                    {kpiData.codeQuality.score >= 80 ? 'A' : kpiData.codeQuality.score >= 60 ? 'B' : 'C'}
-                  </p>
-                  <p className="text-[10px] opacity-75">{kpiData.codeQuality.score} pts</p>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  SonarQube
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+        <KPICard
+          title="Code Quality"
+          icon={Server}
+          isLoading={loadingKPIs.codeQuality}
+          mainValue={kpiData.codeQuality.score >= 80 ? 'A' : kpiData.codeQuality.score >= 60 ? 'B' : 'C'}
+          mainUnit={`${kpiData.codeQuality.score} pts`}
+          secondaryValue="SonarQube"
+        />
 
         {/* Test Coverage */}
-        <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Test Coverage</p>
-            <TrendingUp className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            {loadingKPIs.testCoverage ? (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
-                  <p className="text-[10px] opacity-75">tests</p>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  <div className="h-3 w-10 bg-white/20 rounded animate-pulse"></div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-baseline space-x-1.5">
-                  <p className="text-xl font-bold">{kpiData.testCoverage.coverage}%</p>
-                  <p className="text-[10px] opacity-75">tests</p>
-                </div>
-                <div className="text-[10px] opacity-90">
-                  {kpiData.testCoverage.coverage >= 80 ? '✓ OK' : '⚠ Mejorar'}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+        <KPICard
+          title="Test Coverage"
+          icon={TrendingUp}
+          isLoading={loadingKPIs.testCoverage}
+          mainValue={`${kpiData.testCoverage.coverage}%`}
+          mainUnit="tests"
+          secondaryValue={kpiData.testCoverage.coverage >= 80 ? '✓ OK' : '⚠ Mejorar'}
+        />
       </div>
 
       {/* Mi Último Despliegue - Expandible */}
@@ -587,9 +456,9 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
           {(() => {
             const deployment = myDeployments[0]; // Solo el último
             const statusConfig = {
-              success: { icon: '✓', color: 'bg-green-500', textColor: 'text-green-600', bgLight: 'bg-green-50' },
-              failed: { icon: '✗', color: 'bg-red-500', textColor: 'text-red-600', bgLight: 'bg-red-50' },
-              running: { icon: '●', color: 'bg-blue-500', textColor: 'text-blue-600', bgLight: 'bg-blue-50' },
+              success: { icon: '✓', color: 'bg-slate-600', textColor: 'text-slate-700', bgLight: 'bg-slate-50' },
+              failed: { icon: '✗', color: 'bg-slate-500', textColor: 'text-slate-600', bgLight: 'bg-slate-50' },
+              running: { icon: '●', color: 'bg-slate-600', textColor: 'text-slate-700', bgLight: 'bg-slate-50' },
               pending: { icon: '○', color: 'bg-gray-400', textColor: 'text-gray-600', bgLight: 'bg-gray-50' },
               cancelled: { icon: '⊘', color: 'bg-gray-500', textColor: 'text-gray-600', bgLight: 'bg-gray-50' }
             };
@@ -640,7 +509,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                           setSelectedEnvironment(deployment.environment);
                           handleQuickDeploy();
                         }}
-                        className="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded text-xs font-medium flex items-center space-x-1 transition-colors"
+                        className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-medium flex items-center space-x-1 transition-colors"
                         title="Reintentar despliegue"
                       >
                         <RotateCcw className="h-3 w-3" />
@@ -684,23 +553,23 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                         {deployment.logs.map((log, idx) => {
                           // Determinar el estado del step
                           let stepStatus: 'success' | 'failed' | 'running' | 'pending' = 'success';
-                          let stepColor = 'bg-green-500';
-                          let borderColor = 'border-green-500';
-                          let textColor = 'text-green-700';
-                          let iconBg = 'bg-green-100';
+                          let stepColor = 'bg-slate-600';
+                          let borderColor = 'border-slate-600';
+                          let textColor = 'text-slate-700';
+                          let iconBg = 'bg-slate-100';
 
                           if (log.includes('ERROR') || log.includes('failed') || log.includes('Failed')) {
                             stepStatus = 'failed';
-                            stepColor = 'bg-red-500';
-                            borderColor = 'border-red-500';
-                            textColor = 'text-red-700';
-                            iconBg = 'bg-red-100';
+                            stepColor = 'bg-slate-500';
+                            borderColor = 'border-slate-500';
+                            textColor = 'text-slate-600';
+                            iconBg = 'bg-slate-100';
                           } else if (log.includes('Running') || log.includes('Currently') || log.includes('Deploying')) {
                             stepStatus = 'running';
-                            stepColor = 'bg-blue-500';
-                            borderColor = 'border-blue-500';
-                            textColor = 'text-blue-700';
-                            iconBg = 'bg-blue-100';
+                            stepColor = 'bg-slate-600';
+                            borderColor = 'border-slate-600';
+                            textColor = 'text-slate-700';
+                            iconBg = 'bg-slate-100';
                           }
 
                           // Extraer nombre corto del step
@@ -793,11 +662,11 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
           <div className="bg-white rounded-lg shadow-sm border p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                <Rocket className="h-5 w-5 text-blue-600" />
+                <Rocket className="h-5 w-5 text-slate-600" />
                 <span>Despliegue Rápido</span>
               </h3>
               {isDeploying && (
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full font-medium flex items-center space-x-2">
+                <span className="px-3 py-1 bg-slate-100 text-slate-700 text-sm rounded-full font-medium flex items-center space-x-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Desplegando...</span>
                 </span>
@@ -851,8 +720,8 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                 disabled={isDeploying}
                 className={`px-5 py-2 rounded-md transition-all shadow-md font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 ${
                   scheduledDateTime
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
+                    ? 'bg-slate-600 hover:bg-slate-700 text-white'
+                    : 'bg-slate-700 hover:bg-slate-800 text-white'
                 }`}
               >
                 {isDeploying ? (
@@ -885,18 +754,18 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
             </div>
 
             {showScheduleSuccess && (
-              <div className="mt-3 bg-green-100 border-l-4 border-green-500 rounded p-2.5 flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
-                <p className="text-xs text-green-900 font-medium">
+              <div className="mt-3 bg-slate-100 border-l-4 border-slate-600 rounded p-2.5 flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-slate-700 flex-shrink-0" />
+                <p className="text-xs text-slate-900 font-medium">
                   ✓ Programado: <strong>{selectedBranch}</strong> → <strong>{selectedEnvironment}</strong> el {new Date(scheduledDateTime).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
             )}
 
             {selectedEnvironment === 'PRO' && (
-              <div className="mt-3 bg-red-100 border-l-4 border-red-500 rounded p-2 flex items-center space-x-2">
-                <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0" />
-                <p className="text-xs text-red-900 font-medium">
+              <div className="mt-3 bg-slate-100 border-l-4 border-slate-600 rounded p-2 flex items-center space-x-2">
+                <AlertTriangle className="h-4 w-4 text-slate-700 flex-shrink-0" />
+                <p className="text-xs text-slate-900 font-medium">
                   <strong>Producción:</strong> Asegúrate de que los cambios han sido probados en PRE.
                 </p>
               </div>
@@ -907,7 +776,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
           {pipelineSteps.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm border p-5">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                <Activity className="h-5 w-5 text-purple-600" />
+                <Activity className="h-5 w-5 text-slate-600" />
                 <span>Pipeline CI/CD</span>
               </h3>
 
@@ -918,9 +787,9 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <span className={`text-sm font-medium ${
-                          step.status === 'success' ? 'text-green-700' :
-                          step.status === 'failed' ? 'text-red-700' :
-                          step.status === 'running' ? 'text-blue-700' :
+                          step.status === 'success' ? 'text-slate-700' :
+                          step.status === 'failed' ? 'text-slate-600' :
+                          step.status === 'running' ? 'text-slate-700' :
                           'text-gray-700'
                         }`}>
                           {index + 1}. {step.name}
@@ -940,7 +809,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                 <div className="mt-4 flex items-center justify-center">
                   <button
                     onClick={handleQuickDeploy}
-                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+                    className="flex items-center space-x-2 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors text-sm font-medium"
                   >
                     <RotateCcw className="h-4 w-4" />
                     <span>Reintentar Deploy</span>
@@ -985,7 +854,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
           ) : (
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center space-x-2">
-                <Server className="h-4 w-4 text-blue-600" />
+                <Server className="h-4 w-4 text-slate-600" />
                 <span>Estado de Ambientes</span>
               </h3>
 
@@ -1025,7 +894,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-96">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-blue-600" />
+              <Calendar className="h-5 w-5 text-slate-600" />
               <span>Reprogramar Despliegue</span>
             </h3>
 
@@ -1037,7 +906,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                 type="datetime-local"
                 defaultValue={new Date(rescheduleModal.currentDate).toISOString().slice(0, 16)}
                 min={new Date().toISOString().slice(0, 16)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
                 id="reschedule-datetime"
               />
             </div>
@@ -1050,7 +919,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                     handleConfirmReschedule(new Date(input.value).toISOString());
                   }
                 }}
-                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
+                className="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-colors"
               >
                 Confirmar
               </button>
@@ -1067,4 +936,19 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
