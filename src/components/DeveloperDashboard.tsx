@@ -212,49 +212,100 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
     }
   };
 
+  // Calcular métricas de despliegues
+  const projectDeployments = mockDeployments.filter(d => d.projectId === projectId);
+
+  // Duración de despliegues (solo completados)
+  const completedDeployments = projectDeployments.filter(d => d.duration);
+  const deploymentDurations = completedDeployments.map(d => d.duration || 0);
+  const minDuration = deploymentDurations.length > 0 ? Math.min(...deploymentDurations) : 0;
+  const maxDuration = deploymentDurations.length > 0 ? Math.max(...deploymentDurations) : 0;
+  const avgDuration = deploymentDurations.length > 0
+    ? Math.round(deploymentDurations.reduce((a, b) => a + b, 0) / deploymentDurations.length)
+    : 0;
+
+  // Success Rate (últimos 30 días)
+  const successfulDeployments = projectDeployments.filter(d => d.status === 'success').length;
+  const totalDeployments = projectDeployments.length;
+  const successRate = totalDeployments > 0 ? Math.round((successfulDeployments / totalDeployments) * 100) : 0;
+
+  // Métricas de calidad (simuladas - en producción vendrían de SonarQube/análisis de código)
+  const codeQualityScore = 85; // A (>80), B (60-80), C (<60)
+  const testCoverage = 78; // Porcentaje de cobertura de tests
+
   return (
     <div className="space-y-4">
-      {/* Header Stats */}
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md p-4 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">Ambientes Activos</p>
-              <p className="text-3xl font-bold mt-1">4</p>
+      {/* Header Stats - Métricas de Despliegue y Calidad */}
+      <div className="grid grid-cols-4 gap-3">
+        {/* Tiempo de Despliegue */}
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Tiempo Deploy</p>
+            <Clock className="h-5 w-5 opacity-70" />
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-baseline space-x-1.5">
+              <p className="text-xl font-bold">{Math.floor(avgDuration / 60)}m</p>
+              <p className="text-[10px] opacity-75">avg</p>
             </div>
-            <Server className="h-10 w-10 opacity-80" />
+            <div className="flex items-center space-x-1.5 text-[10px] opacity-90">
+              <span>↓ {Math.floor(minDuration / 60)}m</span>
+              <span>•</span>
+              <span>↑ {Math.floor(maxDuration / 60)}m</span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md p-4 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">Deploy Exitosos</p>
-              <p className="text-3xl font-bold mt-1">24</p>
+        {/* Success Rate */}
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Success Rate</p>
+            <CheckCircle className="h-5 w-5 opacity-70" />
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-baseline space-x-1.5">
+              <p className="text-xl font-bold">{successRate}%</p>
+              <p className="text-[10px] opacity-75">ok</p>
             </div>
-            <CheckCircle className="h-10 w-10 opacity-80" />
+            <div className="text-[10px] opacity-90">
+              {successfulDeployments}/{totalDeployments} deploys
+            </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-md p-4 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">Programados</p>
-              <p className="text-3xl font-bold mt-1">
-                {scheduledDeployments.filter(d => d.projectId === projectId && d.status === 'scheduled').length}
+        {/* Code Quality */}
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Code Quality</p>
+            <Activity className="h-5 w-5 opacity-70" />
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-baseline space-x-1.5">
+              <p className="text-xl font-bold">
+                {codeQualityScore >= 80 ? 'A' : codeQualityScore >= 60 ? 'B' : 'C'}
               </p>
+              <p className="text-[10px] opacity-75">{codeQualityScore} pts</p>
             </div>
-            <Calendar className="h-10 w-10 opacity-80" />
+            <div className="text-[10px] opacity-90">
+              SonarQube
+            </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-md p-4 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">Uptime Promedio</p>
-              <p className="text-3xl font-bold mt-1">98.9%</p>
+        {/* Test Coverage */}
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Test Coverage</p>
+            <TrendingUp className="h-5 w-5 opacity-70" />
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-baseline space-x-1.5">
+              <p className="text-xl font-bold">{testCoverage}%</p>
+              <p className="text-[10px] opacity-75">tests</p>
             </div>
-            <TrendingUp className="h-10 w-10 opacity-80" />
+            <div className="text-[10px] opacity-90">
+              {testCoverage >= 80 ? '✓ OK' : '⚠ Mejorar'}
+            </div>
           </div>
         </div>
       </div>
