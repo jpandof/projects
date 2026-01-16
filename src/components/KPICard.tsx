@@ -21,35 +21,35 @@ export const KPICard: React.FC<KPICardProps> = ({
   additionalInfo
 }) => {
   return (
-    <div className="bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg shadow-sm p-3 text-white">
-      <div className="flex items-center justify-between mb-1">
-        <p className="text-[10px] opacity-90 font-medium">{title}</p>
-        <Icon className="h-5 w-5 opacity-70" />
+    <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-3.5 group">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">{title}</p>
+        <Icon className="h-4 w-4 text-gray-400 group-hover:text-slate-600 transition-colors" />
       </div>
-      <div className="space-y-0.5">
+      <div className="space-y-1">
         {isLoading ? (
           <>
             <div className="flex items-baseline space-x-1.5">
-              <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
-              <p className="text-[10px] opacity-75">{mainUnit || '...'}</p>
+              <div className="h-7 w-12 bg-gray-200 rounded animate-pulse"></div>
+              <p className="text-[10px] text-gray-400">{mainUnit || '...'}</p>
             </div>
             {secondaryValue !== undefined && (
-              <div className="text-[10px] opacity-90">
-                <div className="h-3 w-16 bg-white/20 rounded animate-pulse"></div>
+              <div className="text-[10px] text-gray-400">
+                <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
               </div>
             )}
           </>
         ) : (
           <>
             <div className="flex items-baseline space-x-1.5">
-              <p className="text-xl font-bold">{mainValue}</p>
-              {mainUnit && <p className="text-[10px] opacity-75">{mainUnit}</p>}
+              <p className="text-2xl font-bold text-gray-900">{mainValue}</p>
+              {mainUnit && <p className="text-[10px] text-gray-500 font-medium">{mainUnit}</p>}
             </div>
             {secondaryValue && (
-              <div className="text-[10px] opacity-90">{secondaryValue}</div>
+              <div className="text-[10px] text-gray-600 font-medium">{secondaryValue}</div>
             )}
             {additionalInfo && (
-              <div className="text-[10px] opacity-90">{additionalInfo}</div>
+              <div className="text-[10px] text-gray-500">{additionalInfo}</div>
             )}
           </>
         )}

@@ -351,11 +351,11 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
       case 'pending':
         return <div className="w-5 h-5 rounded-full border-2 border-gray-300"></div>;
       case 'running':
-        return <Loader2 className="h-5 w-5 text-slate-600 animate-spin" />;
+        return <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />;
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-slate-700" />;
+        return <CheckCircle className="h-5 w-5 text-emerald-600" />;
       case 'failed':
-        return <XCircle className="h-5 w-5 text-slate-500" />;
+        return <XCircle className="h-5 w-5 text-rose-600" />;
       case 'skipped':
         return <div className="w-5 h-5 rounded-full border-2 border-gray-200 bg-gray-100"></div>;
     }
@@ -372,13 +372,13 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy':
-        return 'bg-green-100 text-green-700';
+        return 'bg-emerald-50 text-emerald-700 border border-emerald-100';
       case 'warning':
-        return 'bg-yellow-100 text-yellow-700';
+        return 'bg-amber-50 text-amber-700 border border-amber-100';
       case 'error':
-        return 'bg-red-100 text-red-700';
+        return 'bg-rose-50 text-rose-700 border border-rose-100';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-gray-100 text-gray-700 border border-gray-200';
     }
   };
 
@@ -456,9 +456,9 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
           {(() => {
             const deployment = myDeployments[0]; // Solo el último
             const statusConfig = {
-              success: { icon: '✓', color: 'bg-slate-600', textColor: 'text-slate-700', bgLight: 'bg-slate-50' },
-              failed: { icon: '✗', color: 'bg-slate-500', textColor: 'text-slate-600', bgLight: 'bg-slate-50' },
-              running: { icon: '●', color: 'bg-slate-600', textColor: 'text-slate-700', bgLight: 'bg-slate-50' },
+              success: { icon: '✓', color: 'bg-emerald-500', textColor: 'text-emerald-700', bgLight: 'bg-emerald-50' },
+              failed: { icon: '✗', color: 'bg-rose-500', textColor: 'text-rose-700', bgLight: 'bg-rose-50' },
+              running: { icon: '●', color: 'bg-blue-500', textColor: 'text-blue-700', bgLight: 'bg-blue-50' },
               pending: { icon: '○', color: 'bg-gray-400', textColor: 'text-gray-600', bgLight: 'bg-gray-50' },
               cancelled: { icon: '⊘', color: 'bg-gray-500', textColor: 'text-gray-600', bgLight: 'bg-gray-50' }
             };
@@ -509,7 +509,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                           setSelectedEnvironment(deployment.environment);
                           handleQuickDeploy();
                         }}
-                        className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-medium flex items-center space-x-1 transition-colors"
+                        className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-xs font-medium flex items-center space-x-1 transition-colors border border-rose-200"
                         title="Reintentar despliegue"
                       >
                         <RotateCcw className="h-3 w-3" />
@@ -553,23 +553,23 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                         {deployment.logs.map((log, idx) => {
                           // Determinar el estado del step
                           let stepStatus: 'success' | 'failed' | 'running' | 'pending' = 'success';
-                          let stepColor = 'bg-slate-600';
-                          let borderColor = 'border-slate-600';
-                          let textColor = 'text-slate-700';
-                          let iconBg = 'bg-slate-100';
+                          let stepColor = 'bg-emerald-500';
+                          let borderColor = 'border-emerald-500';
+                          let textColor = 'text-emerald-700';
+                          let iconBg = 'bg-emerald-50';
 
                           if (log.includes('ERROR') || log.includes('failed') || log.includes('Failed')) {
                             stepStatus = 'failed';
-                            stepColor = 'bg-slate-500';
-                            borderColor = 'border-slate-500';
-                            textColor = 'text-slate-600';
-                            iconBg = 'bg-slate-100';
+                            stepColor = 'bg-rose-500';
+                            borderColor = 'border-rose-500';
+                            textColor = 'text-rose-700';
+                            iconBg = 'bg-rose-50';
                           } else if (log.includes('Running') || log.includes('Currently') || log.includes('Deploying')) {
                             stepStatus = 'running';
-                            stepColor = 'bg-slate-600';
-                            borderColor = 'border-slate-600';
-                            textColor = 'text-slate-700';
-                            iconBg = 'bg-slate-100';
+                            stepColor = 'bg-blue-500';
+                            borderColor = 'border-blue-500';
+                            textColor = 'text-blue-700';
+                            iconBg = 'bg-blue-50';
                           }
 
                           // Extraer nombre corto del step
@@ -718,11 +718,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
               <button
                 onClick={handleQuickDeploy}
                 disabled={isDeploying}
-                className={`px-5 py-2 rounded-md transition-all shadow-md font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 ${
-                  scheduledDateTime
-                    ? 'bg-slate-600 hover:bg-slate-700 text-white'
-                    : 'bg-slate-700 hover:bg-slate-800 text-white'
-                }`}
+                className="px-5 py-2 rounded-md transition-all font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 text-slate-700 hover:bg-gray-100 active:bg-gray-200"
               >
                 {isDeploying ? (
                   <>
@@ -754,18 +750,18 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
             </div>
 
             {showScheduleSuccess && (
-              <div className="mt-3 bg-slate-100 border-l-4 border-slate-600 rounded p-2.5 flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-slate-700 flex-shrink-0" />
-                <p className="text-xs text-slate-900 font-medium">
+              <div className="mt-3 bg-emerald-50 border-l-4 border-emerald-500 rounded p-2.5 flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                <p className="text-xs text-emerald-900 font-medium">
                   ✓ Programado: <strong>{selectedBranch}</strong> → <strong>{selectedEnvironment}</strong> el {new Date(scheduledDateTime).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
             )}
 
             {selectedEnvironment === 'PRO' && (
-              <div className="mt-3 bg-slate-100 border-l-4 border-slate-600 rounded p-2 flex items-center space-x-2">
-                <AlertTriangle className="h-4 w-4 text-slate-700 flex-shrink-0" />
-                <p className="text-xs text-slate-900 font-medium">
+              <div className="mt-3 bg-amber-50 border-l-4 border-amber-500 rounded p-2 flex items-center space-x-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                <p className="text-xs text-amber-900 font-medium">
                   <strong>Producción:</strong> Asegúrate de que los cambios han sido probados en PRE.
                 </p>
               </div>
@@ -787,9 +783,9 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <span className={`text-sm font-medium ${
-                          step.status === 'success' ? 'text-slate-700' :
-                          step.status === 'failed' ? 'text-slate-600' :
-                          step.status === 'running' ? 'text-slate-700' :
+                          step.status === 'success' ? 'text-emerald-700' :
+                          step.status === 'failed' ? 'text-rose-700' :
+                          step.status === 'running' ? 'text-blue-700' :
                           'text-gray-700'
                         }`}>
                           {index + 1}. {step.name}
@@ -809,7 +805,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                 <div className="mt-4 flex items-center justify-center">
                   <button
                     onClick={handleQuickDeploy}
-                    className="flex items-center space-x-2 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors text-sm font-medium"
+                    className="flex items-center space-x-2 px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg transition-colors text-sm font-medium shadow-sm border border-slate-800"
                   >
                     <RotateCcw className="h-4 w-4" />
                     <span>Reintentar Deploy</span>
@@ -919,13 +915,13 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
                     handleConfirmReschedule(new Date(input.value).toISOString());
                   }
                 }}
-                className="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-colors"
+                className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-semibold transition-colors shadow-sm border border-slate-800"
               >
                 Confirmar
               </button>
               <button
                 onClick={() => setRescheduleModal(null)}
-                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-colors"
+                className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-colors border border-gray-300"
               >
                 Cancelar
               </button>
