@@ -229,6 +229,18 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
   const totalDeployments = projectDeployments.length;
   const successRate = totalDeployments > 0 ? Math.round((successfulDeployments / totalDeployments) * 100) : 0;
 
+  // Deploy Frequency (última semana)
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const deploymentsLastWeek = projectDeployments.filter(d =>
+    new Date(d.startedAt) >= oneWeekAgo
+  ).length;
+  const deployFrequency = (deploymentsLastWeek / 7).toFixed(1); // Deploys por día
+
+  // Pending PRs / Code Review Time (simulado - en producción vendría de GitHub/GitLab API)
+  const pendingPRs = 3; // PRs pendientes de review
+  const avgReviewTimeHours = 18; // Tiempo promedio de review en horas
+
   // Métricas de calidad (simuladas - en producción vendrían de SonarQube/análisis de código)
   const codeQualityScore = 85; // A (>80), B (60-80), C (<60)
   const testCoverage = 78; // Porcentaje de cobertura de tests
@@ -236,7 +248,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
   return (
     <div className="space-y-4">
       {/* Header Stats - Métricas de Despliegue y Calidad */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-6 gap-3">
         {/* Tiempo de Despliegue */}
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-3 text-white">
           <div className="flex items-center justify-between mb-1">
@@ -273,11 +285,45 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
           </div>
         </div>
 
-        {/* Code Quality */}
+        {/* Deploy Frequency */}
         <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-sm p-3 text-white">
           <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Code Quality</p>
+            <p className="text-[10px] opacity-90 font-medium">Deploy Frequency</p>
+            <Rocket className="h-5 w-5 opacity-70" />
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-baseline space-x-1.5">
+              <p className="text-xl font-bold">{deployFrequency}</p>
+              <p className="text-[10px] opacity-75">/día</p>
+            </div>
+            <div className="text-[10px] opacity-90">
+              {deploymentsLastWeek} última semana
+            </div>
+          </div>
+        </div>
+
+        {/* PR Review Time */}
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">PR Review Time</p>
             <Activity className="h-5 w-5 opacity-70" />
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-baseline space-x-1.5">
+              <p className="text-xl font-bold">{avgReviewTimeHours}h</p>
+              <p className="text-[10px] opacity-75">avg</p>
+            </div>
+            <div className="text-[10px] opacity-90">
+              {pendingPRs} PRs pendientes
+            </div>
+          </div>
+        </div>
+
+        {/* Code Quality */}
+        <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Code Quality</p>
+            <Server className="h-5 w-5 opacity-70" />
           </div>
           <div className="space-y-0.5">
             <div className="flex items-baseline space-x-1.5">
@@ -293,7 +339,7 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
         </div>
 
         {/* Test Coverage */}
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-3 text-white">
+        <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-sm p-3 text-white">
           <div className="flex items-center justify-between mb-1">
             <p className="text-[10px] opacity-90 font-medium">Test Coverage</p>
             <TrendingUp className="h-5 w-5 opacity-70" />
