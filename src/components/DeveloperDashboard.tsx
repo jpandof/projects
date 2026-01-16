@@ -17,8 +17,6 @@ import {
 import { mockDeployments } from '../data/environments';
 import { ScheduledDeploymentsList } from './ScheduledDeploymentsList';
 import { RecentDeploymentsList } from './RecentDeploymentsList';
-import { PipelineFlow } from './PipelineFlow';
-import { KPISkeleton } from './KPISkeleton';
 import { DeploymentCardSkeleton } from './DeploymentCardSkeleton';
 import { ScheduledDeploymentsListSkeleton } from './ScheduledDeploymentsListSkeleton';
 import { RecentDeploymentsListSkeleton } from './RecentDeploymentsListSkeleton';
@@ -388,134 +386,196 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
       {/* Header Stats - Métricas de Despliegue y Calidad */}
       <div className="grid grid-cols-6 gap-3">
         {/* Tiempo de Despliegue */}
-        {loadingKPIs.deployTime ? (
-          <KPISkeleton />
-        ) : (
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-3 text-white">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] opacity-90 font-medium">Tiempo Deploy</p>
-              <Clock className="h-5 w-5 opacity-70" />
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-baseline space-x-1.5">
-                <p className="text-xl font-bold">{Math.floor(kpiData.deployTime.avg / 60)}m</p>
-                <p className="text-[10px] opacity-75">avg</p>
-              </div>
-              <div className="flex items-center space-x-1.5 text-[10px] opacity-90">
-                <span>↓ {Math.floor(kpiData.deployTime.min / 60)}m</span>
-                <span>•</span>
-                <span>↑ {Math.floor(kpiData.deployTime.max / 60)}m</span>
-              </div>
-            </div>
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Tiempo Deploy</p>
+            <Clock className="h-5 w-5 opacity-70" />
           </div>
-        )}
+          <div className="space-y-0.5">
+            {loadingKPIs.deployTime ? (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
+                  <p className="text-[10px] opacity-75">avg</p>
+                </div>
+                <div className="flex items-center space-x-1.5 text-[10px] opacity-90">
+                  <div className="h-3 w-10 bg-white/20 rounded animate-pulse"></div>
+                  <span>•</span>
+                  <div className="h-3 w-10 bg-white/20 rounded animate-pulse"></div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <p className="text-xl font-bold">{Math.floor(kpiData.deployTime.avg / 60)}m</p>
+                  <p className="text-[10px] opacity-75">avg</p>
+                </div>
+                <div className="flex items-center space-x-1.5 text-[10px] opacity-90">
+                  <span>↓ {Math.floor(kpiData.deployTime.min / 60)}m</span>
+                  <span>•</span>
+                  <span>↑ {Math.floor(kpiData.deployTime.max / 60)}m</span>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Success Rate */}
-        {loadingKPIs.successRate ? (
-          <KPISkeleton />
-        ) : (
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm p-3 text-white">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] opacity-90 font-medium">Success Rate</p>
-              <CheckCircle className="h-5 w-5 opacity-70" />
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-baseline space-x-1.5">
-                <p className="text-xl font-bold">{kpiData.successRate.rate}%</p>
-                <p className="text-[10px] opacity-75">ok</p>
-              </div>
-              <div className="text-[10px] opacity-90">
-                {kpiData.successRate.successful}/{kpiData.successRate.total} deploys
-              </div>
-            </div>
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Success Rate</p>
+            <CheckCircle className="h-5 w-5 opacity-70" />
           </div>
-        )}
+          <div className="space-y-0.5">
+            {loadingKPIs.successRate ? (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
+                  <p className="text-[10px] opacity-75">ok</p>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  <div className="h-3 w-16 bg-white/20 rounded animate-pulse"></div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <p className="text-xl font-bold">{kpiData.successRate.rate}%</p>
+                  <p className="text-[10px] opacity-75">ok</p>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  {kpiData.successRate.successful}/{kpiData.successRate.total} deploys
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Deploy Frequency */}
-        {loadingKPIs.deployFrequency ? (
-          <KPISkeleton />
-        ) : (
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-sm p-3 text-white">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] opacity-90 font-medium">Deploy Frequency</p>
-              <Rocket className="h-5 w-5 opacity-70" />
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-baseline space-x-1.5">
-                <p className="text-xl font-bold">{kpiData.deployFrequency.frequency}</p>
-                <p className="text-[10px] opacity-75">/día</p>
-              </div>
-              <div className="text-[10px] opacity-90">
-                {kpiData.deployFrequency.count} última semana
-              </div>
-            </div>
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Deploy Frequency</p>
+            <Rocket className="h-5 w-5 opacity-70" />
           </div>
-        )}
+          <div className="space-y-0.5">
+            {loadingKPIs.deployFrequency ? (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
+                  <p className="text-[10px] opacity-75">/día</p>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  <div className="h-3 w-20 bg-white/20 rounded animate-pulse"></div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <p className="text-xl font-bold">{kpiData.deployFrequency.frequency}</p>
+                  <p className="text-[10px] opacity-75">/día</p>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  {kpiData.deployFrequency.count} última semana
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* PR Review Time */}
-        {loadingKPIs.prReviewTime ? (
-          <KPISkeleton />
-        ) : (
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-3 text-white">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] opacity-90 font-medium">PR Review Time</p>
-              <Activity className="h-5 w-5 opacity-70" />
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-baseline space-x-1.5">
-                <p className="text-xl font-bold">{kpiData.prReviewTime.avgHours}h</p>
-                <p className="text-[10px] opacity-75">avg</p>
-              </div>
-              <div className="text-[10px] opacity-90">
-                {kpiData.prReviewTime.pending} PRs pendientes
-              </div>
-            </div>
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">PR Review Time</p>
+            <Activity className="h-5 w-5 opacity-70" />
           </div>
-        )}
+          <div className="space-y-0.5">
+            {loadingKPIs.prReviewTime ? (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
+                  <p className="text-[10px] opacity-75">avg</p>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  <div className="h-3 w-20 bg-white/20 rounded animate-pulse"></div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <p className="text-xl font-bold">{kpiData.prReviewTime.avgHours}h</p>
+                  <p className="text-[10px] opacity-75">avg</p>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  {kpiData.prReviewTime.pending} PRs pendientes
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Code Quality */}
-        {loadingKPIs.codeQuality ? (
-          <KPISkeleton />
-        ) : (
-          <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-sm p-3 text-white">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] opacity-90 font-medium">Code Quality</p>
-              <Server className="h-5 w-5 opacity-70" />
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-baseline space-x-1.5">
-                <p className="text-xl font-bold">
-                  {kpiData.codeQuality.score >= 80 ? 'A' : kpiData.codeQuality.score >= 60 ? 'B' : 'C'}
-                </p>
-                <p className="text-[10px] opacity-75">{kpiData.codeQuality.score} pts</p>
-              </div>
-              <div className="text-[10px] opacity-90">
-                SonarQube
-              </div>
-            </div>
+        <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Code Quality</p>
+            <Server className="h-5 w-5 opacity-70" />
           </div>
-        )}
+          <div className="space-y-0.5">
+            {loadingKPIs.codeQuality ? (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <div className="h-7 w-8 bg-white/20 rounded animate-pulse"></div>
+                  <div className="h-3 w-12 bg-white/20 rounded animate-pulse"></div>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  SonarQube
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <p className="text-xl font-bold">
+                    {kpiData.codeQuality.score >= 80 ? 'A' : kpiData.codeQuality.score >= 60 ? 'B' : 'C'}
+                  </p>
+                  <p className="text-[10px] opacity-75">{kpiData.codeQuality.score} pts</p>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  SonarQube
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Test Coverage */}
-        {loadingKPIs.testCoverage ? (
-          <KPISkeleton />
-        ) : (
-          <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-sm p-3 text-white">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] opacity-90 font-medium">Test Coverage</p>
-              <TrendingUp className="h-5 w-5 opacity-70" />
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-baseline space-x-1.5">
-                <p className="text-xl font-bold">{kpiData.testCoverage.coverage}%</p>
-                <p className="text-[10px] opacity-75">tests</p>
-              </div>
-              <div className="text-[10px] opacity-90">
-                {kpiData.testCoverage.coverage >= 80 ? '✓ OK' : '⚠ Mejorar'}
-              </div>
-            </div>
+        <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-sm p-3 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-[10px] opacity-90 font-medium">Test Coverage</p>
+            <TrendingUp className="h-5 w-5 opacity-70" />
           </div>
-        )}
+          <div className="space-y-0.5">
+            {loadingKPIs.testCoverage ? (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <div className="h-7 w-12 bg-white/20 rounded animate-pulse"></div>
+                  <p className="text-[10px] opacity-75">tests</p>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  <div className="h-3 w-10 bg-white/20 rounded animate-pulse"></div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-baseline space-x-1.5">
+                  <p className="text-xl font-bold">{kpiData.testCoverage.coverage}%</p>
+                  <p className="text-[10px] opacity-75">tests</p>
+                </div>
+                <div className="text-[10px] opacity-90">
+                  {kpiData.testCoverage.coverage >= 80 ? '✓ OK' : '⚠ Mejorar'}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Mi Último Despliegue - Expandible */}
