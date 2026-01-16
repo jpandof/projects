@@ -12,9 +12,42 @@ import { ProductivityAnalytics } from './ProductivityAnalytics';
 import { JiraIntegration } from './JiraIntegration';
 import { NotificationCenter } from './NotificationCenter';
 import { ProjectDependencies } from './ProjectDependencies';
+import { ProjectTraceability } from './ProjectTraceability';
 import { mockProjects } from '../data/projects';
+import { mockDeployments } from '../data/environments';
 import { stacks } from '../data/stacks';
-import { 
+import type { ScheduledDeployment } from './ProjectDeployments';
+
+// Mock data para despliegues programados
+const mockScheduledDeployments: ScheduledDeployment[] = [
+  {
+    id: 'sched-1',
+    projectId: '1',
+    environment: 'production',
+    branch: 'release/v2.1.0',
+    scheduledFor: '2025-11-26T02:00:00Z',
+    status: 'scheduled',
+    createdBy: 'john.doe@example.com',
+    createdAt: '2025-11-25T10:30:00Z',
+    description: 'Production release v2.1.0',
+    autoRollback: true,
+    notifyOnComplete: true
+  },
+  {
+    id: 'sched-2',
+    projectId: '1',
+    environment: 'staging',
+    branch: 'develop',
+    scheduledFor: '2025-11-26T18:00:00Z',
+    status: 'scheduled',
+    createdBy: 'jane.smith@example.com',
+    createdAt: '2025-11-25T09:15:00Z',
+    description: 'Daily staging deployment',
+    autoRollback: false,
+    notifyOnComplete: true
+  }
+];
+import {
   Activity, 
   Server, 
   FileText, 
@@ -27,19 +60,19 @@ import {
   AlertTriangle,
   CheckCircle,
   Bell,
-  Shield,
   ArrowLeft,
   TestTube,
   Bot,
   Gauge,
   ExternalLink,
-  Package
+  Package,
+  Network
 } from 'lucide-react';
 
 export const ProjectOverview: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const [activeTab, setActiveTab] = useState<'overview' | 'environments' | 'deployments' | 'logs' | 'team' | 'alerts' | 'testing' | 'ai-review' | 'productivity' | 'jira' | 'settings'>('overview');
-  
+  const [activeTab, setActiveTab] = useState<'overview' | 'dependencies' | 'environments' | 'deployments' | 'logs' | 'team' | 'alerts' | 'testing' | 'ai-review' | 'productivity' | 'jira' | 'traceability' | 'settings'>('overview');
+
   const project = projectId ? mockProjects.find(p => p.id === projectId) : null;
   const stackInfo = project ? stacks.find(s => s.id === project.stack) : null;
 
@@ -156,6 +189,7 @@ export const ProjectOverview: React.FC = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Activity },
+    { id: 'traceability', label: 'Traceability', icon: Network },
     { id: 'dependencies', label: 'Dependencies', icon: Package },
     { id: 'environments', label: 'Environments', icon: Server },
     { id: 'deployments', label: 'Deployments', icon: Rocket },
@@ -168,6 +202,7 @@ export const ProjectOverview: React.FC = () => {
     { id: 'jira', label: 'JIRA', icon: ExternalLink },
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
+
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -191,6 +226,8 @@ export const ProjectOverview: React.FC = () => {
         return <ProductivityAnalytics projectId={projectId!} />;
       case 'jira':
         return <JiraIntegration projectId={projectId!} />;
+      case 'traceability':
+        return <ProjectTraceability projectId={projectId!} />;
       case 'settings':
         return <ProjectSettings projectId={projectId!} />;
       default:
@@ -342,6 +379,162 @@ export const ProjectOverview: React.FC = () => {
                 </button>
               </div>
             </div>
+
+            {/* Deployment Overview */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Scheduled Deployments */}
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-5 w-5 text-blue-500" />
+                    <h3 className="text-lg font-medium text-gray-900">Despliegues Programados</h3>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('deployments')}
+                    className="text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    Ver todos
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {mockScheduledDeployments
+                    .filter(d => d.projectId === projectId && d.status === 'scheduled')
+                    .slice(0, 3)
+                    .map((deployment) => {
+                      const scheduledDate = new Date(deployment.scheduledFor);
+                      const now = new Date();
+                      const diff = scheduledDate.getTime() - now.getTime();
+                      const hours = Math.floor(diff / (1000 * 60 * 60));
+                      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+                      let timeUntil = '';
+                      if (hours > 24) {
+                        const days = Math.floor(hours / 24);
+                        timeUntil = `En ${days}d ${hours % 24}h`;
+                      } else if (hours > 0) {
+                        timeUntil = `En ${hours}h ${minutes}m`;
+                      } else {
+                        timeUntil = `En ${minutes}m`;
+                      }
+
+                      return (
+                        <div key={deployment.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              <Server className="h-4 w-4 text-blue-500" />
+                              <span className="font-medium text-sm text-gray-900">
+                                {deployment.environment.toUpperCase()}
+                              </span>
+                            </div>
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded font-medium">
+                              {timeUntil}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-xs text-gray-500">
+                            <GitBranch className="h-3 w-3" />
+                            <span className="font-mono">{deployment.branch}</span>
+                          </div>
+                          {deployment.description && (
+                            <p className="text-xs text-gray-600 mt-1">{deployment.description}</p>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                  {mockScheduledDeployments.filter(d => d.projectId === projectId && d.status === 'scheduled').length === 0 && (
+                    <div className="text-center py-6">
+                      <Calendar className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">No hay despliegues programados</p>
+                      <button
+                        onClick={() => setActiveTab('deployments')}
+                        className="mt-2 text-sm text-blue-600 hover:text-blue-700"
+                      >
+                        Programar despliegue
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Recent Deployments */}
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <Rocket className="h-5 w-5 text-purple-500" />
+                    <h3 className="text-lg font-medium text-gray-900">Despliegues Recientes</h3>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('deployments')}
+                    className="text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    Ver historial
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {mockDeployments
+                    .filter(d => d.projectId === projectId)
+                    .slice(0, 3)
+                    .map((deployment) => {
+                      const statusColors = {
+                        success: 'bg-green-100 text-green-700',
+                        failed: 'bg-red-100 text-red-700',
+                        running: 'bg-blue-100 text-blue-700',
+                        pending: 'bg-yellow-100 text-yellow-700',
+                        cancelled: 'bg-gray-100 text-gray-700'
+                      };
+
+                      const statusIcons = {
+                        success: <CheckCircle className="h-4 w-4 text-green-500" />,
+                        failed: <AlertTriangle className="h-4 w-4 text-red-500" />,
+                        running: <Activity className="h-4 w-4 text-blue-500 animate-pulse" />,
+                        pending: <Calendar className="h-4 w-4 text-yellow-500" />,
+                        cancelled: <AlertTriangle className="h-4 w-4 text-gray-500" />
+                      };
+
+                      return (
+                        <div key={deployment.id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center space-x-2">
+                              {statusIcons[deployment.status]}
+                              <span className="font-medium text-sm text-gray-900">
+                                {deployment.environment.toUpperCase()}
+                              </span>
+                            </div>
+                            <span className={`px-2 py-1 text-xs rounded font-medium ${statusColors[deployment.status]}`}>
+                              {deployment.status === 'success' ? 'Exitoso' :
+                               deployment.status === 'failed' ? 'Fallido' :
+                               deployment.status === 'running' ? 'En Curso' :
+                               deployment.status === 'pending' ? 'Pendiente' : 'Cancelado'}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-xs text-gray-500">
+                            <GitBranch className="h-3 w-3" />
+                            <span className="font-mono">{deployment.branch}</span>
+                            <span>•</span>
+                            <span className="font-mono">{deployment.commit}</span>
+                          </div>
+                          <p className="text-xs text-gray-600 mt-1 line-clamp-1">{deployment.commitMessage}</p>
+                        </div>
+                      );
+                    })}
+
+                  {mockDeployments.filter(d => d.projectId === projectId).length === 0 && (
+                    <div className="text-center py-6">
+                      <Rocket className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">No hay despliegues recientes</p>
+                      <button
+                        onClick={() => setActiveTab('deployments')}
+                        className="mt-2 text-sm text-blue-600 hover:text-blue-700"
+                      >
+                        Ver despliegues
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         );
     }
@@ -434,10 +627,11 @@ export const ProjectOverview: React.FC = () => {
               >
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
+                  const tabId = tab.id as typeof activeTab;
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
+                      onClick={() => setActiveTab(tabId)}
                       className={`flex items-center space-x-2 py-4 px-3 border-b-2 font-medium text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
                         activeTab === tab.id
                           ? 'border-blue-500 text-blue-600'
