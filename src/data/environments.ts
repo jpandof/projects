@@ -177,6 +177,92 @@ export const mockLogs: LogEntry[] = [
 ];
 
 export const mockDeployments: Deployment[] = [
+  // Despliegues del usuario actual
+  {
+    id: 'deploy-current-001',
+    projectId: 'proj-001',
+    environment: 'TST',
+    status: 'success',
+    branch: 'develop',
+    commit: 'abc123f',
+    commitMessage: 'feat: Add new dashboard features',
+    author: 'current.user@example.com',
+    startedAt: '2026-01-16T10:30:00Z',
+    completedAt: '2026-01-16T10:35:45Z',
+    duration: 345,
+    logs: [
+      'Starting deployment...',
+      'Installing dependencies...',
+      'Running tests...',
+      'Building application...',
+      'Deploying to TST...',
+      'Deployment completed successfully!'
+    ]
+  },
+  {
+    id: 'deploy-current-002',
+    projectId: 'proj-001',
+    environment: 'EDEN',
+    status: 'success',
+    branch: 'feature/new-ui',
+    commit: 'def456g',
+    commitMessage: 'fix: Button alignment issues',
+    author: 'current.user@example.com',
+    startedAt: '2026-01-16T09:15:00Z',
+    completedAt: '2026-01-16T09:18:20Z',
+    duration: 200,
+    logs: [
+      'Starting deployment...',
+      'Installing dependencies...',
+      'Running tests...',
+      'Building application...',
+      'Deploying to EDEN...',
+      'Deployment completed successfully!'
+    ]
+  },
+  {
+    id: 'deploy-current-003',
+    projectId: 'proj-001',
+    environment: 'PRE',
+    status: 'failed',
+    branch: 'hotfix/urgent-fix',
+    commit: 'ghi789h',
+    commitMessage: 'hotfix: Critical security patch',
+    author: 'current.user@example.com',
+    startedAt: '2026-01-15T16:45:00Z',
+    completedAt: '2026-01-15T16:50:30Z',
+    duration: 330,
+    logs: [
+      'Starting deployment...',
+      'Installing dependencies...',
+      'Running tests...',
+      'Building application...',
+      'Deploying to PRE...',
+      'ERROR: Health check failed',
+      'Deployment failed!'
+    ]
+  },
+  {
+    id: 'deploy-current-004',
+    projectId: 'proj-001',
+    environment: 'TST',
+    status: 'success',
+    branch: 'develop',
+    commit: 'jkl012i',
+    commitMessage: 'chore: Update dependencies',
+    author: 'current.user@example.com',
+    startedAt: '2026-01-15T14:20:00Z',
+    completedAt: '2026-01-15T14:24:15Z',
+    duration: 255,
+    logs: [
+      'Starting deployment...',
+      'Installing dependencies...',
+      'Running tests...',
+      'Building application...',
+      'Deploying to TST...',
+      'Deployment completed successfully!'
+    ]
+  },
   {
     id: 'deploy-001',
     projectId: 'proj-001',

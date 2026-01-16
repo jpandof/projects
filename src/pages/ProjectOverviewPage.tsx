@@ -15,6 +15,7 @@ import { ProjectDependencies } from '../components/ProjectDependencies';
 import { ProjectTraceabilityEnhanced } from '../components/ProjectTraceabilityEnhanced';
 import { ScheduledDeploymentsList } from '../components/ScheduledDeploymentsList';
 import { RecentDeploymentsList } from '../components/RecentDeploymentsList';
+import { DeveloperDashboard } from '../components/DeveloperDashboard';
 import { mockProjects } from '../data/projects';
 import { mockDeployments } from '../data/environments';
 import { stacks } from '../data/stacks';
@@ -22,136 +23,150 @@ import type { ScheduledDeployment } from '../components/ProjectDeployments';
 
 // Mock data para despliegues programados
 const mockScheduledDeployments: ScheduledDeployment[] = [
-  // Proyecto 1
+  // Despliegues programados por el usuario actual
   {
-    id: 'sched-example-1',
-    projectId: '1',
+    id: 'sched-current-1',
+    projectId: 'proj-001',
+    environment: 'TST',
+    branch: 'develop',
+    scheduledFor: '2026-01-17T14:00:00Z',
+    status: 'scheduled',
+    createdBy: 'current.user@example.com',
+    createdAt: '2026-01-16T09:00:00Z',
+    description: 'Deploy de prueba a TST',
+    autoRollback: false,
+    notifyOnComplete: true
+  },
+  {
+    id: 'sched-current-2',
+    projectId: 'proj-001',
+    environment: 'PRE',
+    branch: 'hotfix/urgent-fix',
+    scheduledFor: '2026-01-18T18:30:00Z',
+    status: 'scheduled',
+    createdBy: 'current.user@example.com',
+    createdAt: '2026-01-16T11:00:00Z',
+    description: 'Hotfix programado a PRE',
+    autoRollback: true,
+    notifyOnComplete: true
+  },
+  {
+    id: 'sched-current-3',
+    projectId: 'proj-001',
     environment: 'PRO',
     branch: 'release/v2.1.0',
-    scheduledFor: '2025-11-28T10:00:00Z',
+    scheduledFor: '2026-01-20T10:00:00Z',
+    status: 'scheduled',
+    createdBy: 'current.user@example.com',
+    createdAt: '2026-01-16T10:00:00Z',
+    description: 'Release programado a producción v2.1.0',
+    autoRollback: true,
+    notifyOnComplete: true
+  },
+  // Proyecto 1 - proj-001
+  {
+    id: 'sched-example-1',
+    projectId: 'proj-001',
+    environment: 'PRO',
+    branch: 'release/v2.1.0',
+    scheduledFor: '2026-01-20T10:00:00Z',
     status: 'scheduled',
     createdBy: 'john.doe@example.com',
-    createdAt: '2025-11-27T10:00:00Z',
+    createdAt: '2026-01-16T10:00:00Z',
     description: 'Release a producción v2.1.0',
     autoRollback: true,
     notifyOnComplete: true
   },
   {
     id: 'sched-tst-1',
-    projectId: '1',
+    projectId: 'proj-001',
     environment: 'TST',
     branch: 'develop',
-    scheduledFor: '2025-11-27T20:00:00Z',
+    scheduledFor: '2026-01-17T14:00:00Z',
     status: 'scheduled',
     createdBy: 'dev@example.com',
-    createdAt: '2025-11-27T09:00:00Z',
+    createdAt: '2026-01-16T09:00:00Z',
     description: 'Deploy a TST',
     autoRollback: false,
     notifyOnComplete: true
   },
   {
     id: 'sched-pre-1',
-    projectId: '1',
+    projectId: 'proj-001',
     environment: 'PRE',
     branch: 'hotfix/urgent-fix',
-    scheduledFor: '2025-11-27T18:30:00Z',
+    scheduledFor: '2026-01-18T18:30:00Z',
     status: 'scheduled',
     createdBy: 'dev@example.com',
-    createdAt: '2025-11-27T11:00:00Z',
+    createdAt: '2026-01-16T11:00:00Z',
     description: 'Hotfix a PRE',
     autoRollback: true,
     notifyOnComplete: true
   },
-  // Proyecto 2
+  {
+    id: 'sched-eden-1',
+    projectId: 'proj-001',
+    environment: 'EDEN',
+    branch: 'feature/new-feature',
+    scheduledFor: '2026-01-17T09:00:00Z',
+    status: 'scheduled',
+    createdBy: 'dev@example.com',
+    createdAt: '2026-01-16T08:00:00Z',
+    description: 'Testing nueva feature',
+    autoRollback: false,
+    notifyOnComplete: true
+  },
+  // Proyecto 2 - proj-002
   {
     id: 'sched-example-2',
-    projectId: '2',
+    projectId: 'proj-002',
     environment: 'PRO',
     branch: 'main',
-    scheduledFor: '2025-11-28T09:00:00Z',
+    scheduledFor: '2026-01-19T09:00:00Z',
     status: 'scheduled',
     createdBy: 'admin@example.com',
-    createdAt: '2025-11-27T08:00:00Z',
+    createdAt: '2026-01-16T08:00:00Z',
     description: 'Deploy matutino',
     autoRollback: true,
     notifyOnComplete: true
   },
   {
     id: 'sched-tst-2',
-    projectId: '2',
+    projectId: 'proj-002',
     environment: 'TST',
     branch: 'develop',
-    scheduledFor: '2025-11-27T19:00:00Z',
+    scheduledFor: '2026-01-17T19:00:00Z',
     status: 'scheduled',
     createdBy: 'dev@example.com',
-    createdAt: '2025-11-27T10:00:00Z',
+    createdAt: '2026-01-16T10:00:00Z',
     description: 'Testing nocturno',
     autoRollback: false,
     notifyOnComplete: true
   },
-  // Proyecto 3
+  // Proyecto 3 - proj-003
   {
     id: 'sched-example-3',
-    projectId: '3',
+    projectId: 'proj-003',
     environment: 'PRE',
     branch: 'release/v1.5',
-    scheduledFor: '2025-11-28T14:00:00Z',
+    scheduledFor: '2026-01-21T14:00:00Z',
     status: 'scheduled',
     createdBy: 'qa@example.com',
-    createdAt: '2025-11-27T11:00:00Z',
+    createdAt: '2026-01-16T11:00:00Z',
     description: 'QA release',
     autoRollback: true,
     notifyOnComplete: true
   },
   {
     id: 'sched-eden-3',
-    projectId: '3',
+    projectId: 'proj-003',
     environment: 'EDEN',
     branch: 'feature/api-v2',
-    scheduledFor: '2025-11-27T17:00:00Z',
+    scheduledFor: '2026-01-17T17:00:00Z',
     status: 'scheduled',
     createdBy: 'dev@example.com',
-    createdAt: '2025-11-27T12:00:00Z',
+    createdAt: '2026-01-16T12:00:00Z',
     description: 'Nueva API',
-    autoRollback: false,
-    notifyOnComplete: false
-  },
-  {
-    id: 'sched-1',
-    projectId: '1',
-    environment: 'production',
-    branch: 'release/v2.1.0',
-    scheduledFor: '2025-11-27T02:00:00Z',
-    status: 'scheduled',
-    createdBy: 'john.doe@example.com',
-    createdAt: '2025-11-25T10:30:00Z',
-    description: 'Production release v2.1.0',
-    autoRollback: true,
-    notifyOnComplete: true
-  },
-  {
-    id: 'sched-2',
-    projectId: '1',
-    environment: 'staging',
-    branch: 'develop',
-    scheduledFor: '2025-11-26T18:00:00Z',
-    status: 'scheduled',
-    createdBy: 'jane.smith@example.com',
-    createdAt: '2025-11-25T09:15:00Z',
-    description: 'Daily staging deployment',
-    autoRollback: false,
-    notifyOnComplete: true
-  },
-  {
-    id: 'sched-3',
-    projectId: '1',
-    environment: 'development',
-    branch: 'feature/new-ui',
-    scheduledFor: '2025-11-26T14:00:00Z',
-    status: 'scheduled',
-    createdBy: 'dev@example.com',
-    createdAt: '2025-11-26T09:00:00Z',
-    description: 'Test new UI components',
     autoRollback: false,
     notifyOnComplete: false
   }
@@ -175,12 +190,13 @@ import {
   Gauge,
   ExternalLink,
   Package,
-  Network
+  Network,
+  Zap
 } from 'lucide-react';
 
 export const ProjectOverviewPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const [activeTab, setActiveTab] = useState<'overview' | 'dependencies' | 'traceability' | 'environments' | 'deployments' | 'logs' | 'team' | 'alerts' | 'testing' | 'ai-review' | 'productivity' | 'jira' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'overview' | 'dependencies' | 'traceability' | 'environments' | 'deployments' | 'logs' | 'team' | 'alerts' | 'testing' | 'ai-review' | 'productivity' | 'jira' | 'settings'>('dashboard');
 
   // Branches disponibles (mock - en producción vendrían del repo)
   const availableBranches = ['main', 'develop', 'staging', 'release/v2.0', 'hotfix/urgent', 'feature/new-ui'];
@@ -337,6 +353,7 @@ export const ProjectOverviewPage: React.FC = () => {
   };
 
   const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: Zap },
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'traceability', label: 'Traceability', icon: Network },
     { id: 'dependencies', label: 'Dependencies', icon: Package },
@@ -354,6 +371,8 @@ export const ProjectOverviewPage: React.FC = () => {
 
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'dashboard':
+        return <DeveloperDashboard projectId={projectId!} scheduledDeployments={mockScheduledDeployments} />;
       case 'dependencies':
         return <ProjectDependencies projectId={projectId!} />;
       case 'traceability':
