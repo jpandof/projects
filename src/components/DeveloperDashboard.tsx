@@ -12,7 +12,9 @@ import {
   Activity,
   ChevronDown,
   ChevronUp,
-  Clock
+  Clock,
+  Copy,
+  ExternalLink
 } from 'lucide-react';
 import { mockDeployments } from '../data/environments';
 import { ScheduledDeploymentsList } from './ScheduledDeploymentsList';
@@ -52,6 +54,30 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
   const [scheduledDeployments, setScheduledDeployments] = useState<ScheduledDeployment[]>(initialScheduledDeployments);
   const [rescheduleModal, setRescheduleModal] = useState<{ id: string; currentDate: string } | null>(null);
   const [isLastDeployExpanded, setIsLastDeployExpanded] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
+
+  // Función para generar URL según el entorno
+  const generateDeploymentUrl = (environment: string, branch: string, projectName: string = 'e-commerce') => {
+    const branchSlug = branch.replace(/\//g, '-').toLowerCase();
+    const baseUrls: Record<string, string> = {
+      'EDEN': `https://eden-${branchSlug}-${projectName}.dev.company.com`,
+      'TST': `https://tst-${projectName}.test.company.com`,
+      'PRE': `https://pre-${projectName}.staging.company.com`,
+      'PRO': `https://${projectName}.company.com`
+    };
+    return baseUrls[environment] || `https://${environment.toLowerCase()}-${projectName}.company.com`;
+  };
+
+  // Función para copiar URL al portapapeles
+  const handleCopyUrl = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2000);
+    } catch (err) {
+      console.error('Error al copiar:', err);
+    }
+  };
 
   // Estados de carga para cada KPI (simular llamadas API independientes)
   const [loadingKPIs, setLoadingKPIs] = useState({
@@ -500,6 +526,30 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
 
                   <div className="flex items-center space-x-3 ml-3">
                     <span className="text-xs text-gray-400">{timeAgo}</span>
+
+                    {/* URL del despliegue con botón de copiar */}
+                    {(deployment.status === 'success' || deployment.status === 'running') && (
+                      <div className="flex items-center space-x-1 bg-gray-50 border border-gray-200 rounded px-2 py-1">
+                        <ExternalLink className="h-3 w-3 text-gray-500" />
+                        <span className="text-xs text-gray-600 font-mono max-w-[120px] truncate">
+                          {generateDeploymentUrl(deployment.environment, deployment.branch).replace('https://', '')}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCopyUrl(generateDeploymentUrl(deployment.environment, deployment.branch));
+                          }}
+                          className="p-0.5 hover:bg-gray-200 rounded transition-colors"
+                          title="Copiar URL"
+                        >
+                          {copiedUrl ? (
+                            <CheckCircle className="h-3 w-3 text-emerald-600" />
+                          ) : (
+                            <Copy className="h-3 w-3 text-gray-500" />
+                          )}
+                        </button>
+                      </div>
+                    )}
 
                     {deployment.status === 'failed' && (
                       <button
