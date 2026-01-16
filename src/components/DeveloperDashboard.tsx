@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Rocket,
   Calendar,
@@ -17,6 +17,7 @@ import {
 import { mockDeployments } from '../data/environments';
 import { ScheduledDeploymentsList } from './ScheduledDeploymentsList';
 import { RecentDeploymentsList } from './RecentDeploymentsList';
+import { KPISkeleton } from './KPISkeleton';
 import type { ScheduledDeployment } from './ProjectDeployments';
 
 interface DeveloperDashboardProps {
@@ -48,11 +49,136 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
   const [rescheduleModal, setRescheduleModal] = useState<{ id: string; currentDate: string } | null>(null);
   const [isLastDeployExpanded, setIsLastDeployExpanded] = useState(false);
 
+  // Estados de carga para cada KPI (simular llamadas API independientes)
+  const [loadingKPIs, setLoadingKPIs] = useState({
+    deployTime: true,
+    successRate: true,
+    deployFrequency: true,
+    prReviewTime: true,
+    codeQuality: true,
+    testCoverage: true,
+  });
+
+  // Estados de datos de KPIs
+  const [kpiData, setKpiData] = useState({
+    deployTime: { min: 0, max: 0, avg: 0 },
+    successRate: { rate: 0, successful: 0, total: 0 },
+    deployFrequency: { frequency: '0.0', count: 0 },
+    prReviewTime: { avgHours: 0, pending: 0 },
+    codeQuality: { score: 0 },
+    testCoverage: { coverage: 0 },
+  });
+
   // Filtrar despliegues del usuario actual (solo el último)
   const myDeployments = mockDeployments
     .filter(d => d.projectId === projectId && d.author === currentUser)
     .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
     .slice(0, 1); // Solo 1 despliegue
+
+  // Simular carga de KPI: Deploy Time (400ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const projectDeployments = mockDeployments.filter(d => d.projectId === projectId);
+      const completedDeployments = projectDeployments.filter(d => d.duration);
+      const durations = completedDeployments.map(d => d.duration || 0);
+
+      setKpiData(prev => ({
+        ...prev,
+        deployTime: {
+          min: durations.length > 0 ? Math.min(...durations) : 0,
+          max: durations.length > 0 ? Math.max(...durations) : 0,
+          avg: durations.length > 0 ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : 0,
+        }
+      }));
+      setLoadingKPIs(prev => ({ ...prev, deployTime: false }));
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  // Simular carga de KPI: Success Rate (600ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const projectDeployments = mockDeployments.filter(d => d.projectId === projectId);
+      const successful = projectDeployments.filter(d => d.status === 'success').length;
+      const total = projectDeployments.length;
+
+      setKpiData(prev => ({
+        ...prev,
+        successRate: {
+          rate: total > 0 ? Math.round((successful / total) * 100) : 0,
+          successful,
+          total,
+        }
+      }));
+      setLoadingKPIs(prev => ({ ...prev, successRate: false }));
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  // Simular carga de KPI: Deploy Frequency (800ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const projectDeployments = mockDeployments.filter(d => d.projectId === projectId);
+      const now = new Date();
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const deploymentsLastWeek = projectDeployments.filter(d =>
+        new Date(d.startedAt) >= oneWeekAgo
+      ).length;
+
+      setKpiData(prev => ({
+        ...prev,
+        deployFrequency: {
+          frequency: (deploymentsLastWeek / 7).toFixed(1),
+          count: deploymentsLastWeek,
+        }
+      }));
+      setLoadingKPIs(prev => ({ ...prev, deployFrequency: false }));
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  // Simular carga de KPI: PR Review Time (1000ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setKpiData(prev => ({
+        ...prev,
+        prReviewTime: {
+          avgHours: 18,
+          pending: 3,
+        }
+      }));
+      setLoadingKPIs(prev => ({ ...prev, prReviewTime: false }));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  // Simular carga de KPI: Code Quality (1200ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setKpiData(prev => ({
+        ...prev,
+        codeQuality: {
+          score: 85,
+        }
+      }));
+      setLoadingKPIs(prev => ({ ...prev, codeQuality: false }));
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [projectId]);
+
+  // Simular carga de KPI: Test Coverage (1400ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setKpiData(prev => ({
+        ...prev,
+        testCoverage: {
+          coverage: 78,
+        }
+      }));
+      setLoadingKPIs(prev => ({ ...prev, testCoverage: false }));
+    }, 1400);
+    return () => clearTimeout(timer);
+  }, [projectId]);
 
   // Branches disponibles
   const availableBranches = ['main', 'develop', 'staging', 'release/v2.0', 'hotfix/urgent', 'feature/new-ui'];
@@ -212,148 +338,139 @@ export const DeveloperDashboard: React.FC<DeveloperDashboardProps> = ({
     }
   };
 
-  // Calcular métricas de despliegues
-  const projectDeployments = mockDeployments.filter(d => d.projectId === projectId);
-
-  // Duración de despliegues (solo completados)
-  const completedDeployments = projectDeployments.filter(d => d.duration);
-  const deploymentDurations = completedDeployments.map(d => d.duration || 0);
-  const minDuration = deploymentDurations.length > 0 ? Math.min(...deploymentDurations) : 0;
-  const maxDuration = deploymentDurations.length > 0 ? Math.max(...deploymentDurations) : 0;
-  const avgDuration = deploymentDurations.length > 0
-    ? Math.round(deploymentDurations.reduce((a, b) => a + b, 0) / deploymentDurations.length)
-    : 0;
-
-  // Success Rate (últimos 30 días)
-  const successfulDeployments = projectDeployments.filter(d => d.status === 'success').length;
-  const totalDeployments = projectDeployments.length;
-  const successRate = totalDeployments > 0 ? Math.round((successfulDeployments / totalDeployments) * 100) : 0;
-
-  // Deploy Frequency (última semana)
-  const now = new Date();
-  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const deploymentsLastWeek = projectDeployments.filter(d =>
-    new Date(d.startedAt) >= oneWeekAgo
-  ).length;
-  const deployFrequency = (deploymentsLastWeek / 7).toFixed(1); // Deploys por día
-
-  // Pending PRs / Code Review Time (simulado - en producción vendría de GitHub/GitLab API)
-  const pendingPRs = 3; // PRs pendientes de review
-  const avgReviewTimeHours = 18; // Tiempo promedio de review en horas
-
-  // Métricas de calidad (simuladas - en producción vendrían de SonarQube/análisis de código)
-  const codeQualityScore = 85; // A (>80), B (60-80), C (<60)
-  const testCoverage = 78; // Porcentaje de cobertura de tests
-
   return (
     <div className="space-y-4">
       {/* Header Stats - Métricas de Despliegue y Calidad */}
       <div className="grid grid-cols-6 gap-3">
         {/* Tiempo de Despliegue */}
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Tiempo Deploy</p>
-            <Clock className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-baseline space-x-1.5">
-              <p className="text-xl font-bold">{Math.floor(avgDuration / 60)}m</p>
-              <p className="text-[10px] opacity-75">avg</p>
+        {loadingKPIs.deployTime ? (
+          <KPISkeleton />
+        ) : (
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm p-3 text-white">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] opacity-90 font-medium">Tiempo Deploy</p>
+              <Clock className="h-5 w-5 opacity-70" />
             </div>
-            <div className="flex items-center space-x-1.5 text-[10px] opacity-90">
-              <span>↓ {Math.floor(minDuration / 60)}m</span>
-              <span>•</span>
-              <span>↑ {Math.floor(maxDuration / 60)}m</span>
+            <div className="space-y-0.5">
+              <div className="flex items-baseline space-x-1.5">
+                <p className="text-xl font-bold">{Math.floor(kpiData.deployTime.avg / 60)}m</p>
+                <p className="text-[10px] opacity-75">avg</p>
+              </div>
+              <div className="flex items-center space-x-1.5 text-[10px] opacity-90">
+                <span>↓ {Math.floor(kpiData.deployTime.min / 60)}m</span>
+                <span>•</span>
+                <span>↑ {Math.floor(kpiData.deployTime.max / 60)}m</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Success Rate */}
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Success Rate</p>
-            <CheckCircle className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-baseline space-x-1.5">
-              <p className="text-xl font-bold">{successRate}%</p>
-              <p className="text-[10px] opacity-75">ok</p>
+        {loadingKPIs.successRate ? (
+          <KPISkeleton />
+        ) : (
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm p-3 text-white">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] opacity-90 font-medium">Success Rate</p>
+              <CheckCircle className="h-5 w-5 opacity-70" />
             </div>
-            <div className="text-[10px] opacity-90">
-              {successfulDeployments}/{totalDeployments} deploys
+            <div className="space-y-0.5">
+              <div className="flex items-baseline space-x-1.5">
+                <p className="text-xl font-bold">{kpiData.successRate.rate}%</p>
+                <p className="text-[10px] opacity-75">ok</p>
+              </div>
+              <div className="text-[10px] opacity-90">
+                {kpiData.successRate.successful}/{kpiData.successRate.total} deploys
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Deploy Frequency */}
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Deploy Frequency</p>
-            <Rocket className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-baseline space-x-1.5">
-              <p className="text-xl font-bold">{deployFrequency}</p>
-              <p className="text-[10px] opacity-75">/día</p>
+        {loadingKPIs.deployFrequency ? (
+          <KPISkeleton />
+        ) : (
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-sm p-3 text-white">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] opacity-90 font-medium">Deploy Frequency</p>
+              <Rocket className="h-5 w-5 opacity-70" />
             </div>
-            <div className="text-[10px] opacity-90">
-              {deploymentsLastWeek} última semana
+            <div className="space-y-0.5">
+              <div className="flex items-baseline space-x-1.5">
+                <p className="text-xl font-bold">{kpiData.deployFrequency.frequency}</p>
+                <p className="text-[10px] opacity-75">/día</p>
+              </div>
+              <div className="text-[10px] opacity-90">
+                {kpiData.deployFrequency.count} última semana
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* PR Review Time */}
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">PR Review Time</p>
-            <Activity className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-baseline space-x-1.5">
-              <p className="text-xl font-bold">{avgReviewTimeHours}h</p>
-              <p className="text-[10px] opacity-75">avg</p>
+        {loadingKPIs.prReviewTime ? (
+          <KPISkeleton />
+        ) : (
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-sm p-3 text-white">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] opacity-90 font-medium">PR Review Time</p>
+              <Activity className="h-5 w-5 opacity-70" />
             </div>
-            <div className="text-[10px] opacity-90">
-              {pendingPRs} PRs pendientes
+            <div className="space-y-0.5">
+              <div className="flex items-baseline space-x-1.5">
+                <p className="text-xl font-bold">{kpiData.prReviewTime.avgHours}h</p>
+                <p className="text-[10px] opacity-75">avg</p>
+              </div>
+              <div className="text-[10px] opacity-90">
+                {kpiData.prReviewTime.pending} PRs pendientes
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Code Quality */}
-        <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Code Quality</p>
-            <Server className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-baseline space-x-1.5">
-              <p className="text-xl font-bold">
-                {codeQualityScore >= 80 ? 'A' : codeQualityScore >= 60 ? 'B' : 'C'}
-              </p>
-              <p className="text-[10px] opacity-75">{codeQualityScore} pts</p>
+        {loadingKPIs.codeQuality ? (
+          <KPISkeleton />
+        ) : (
+          <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg shadow-sm p-3 text-white">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] opacity-90 font-medium">Code Quality</p>
+              <Server className="h-5 w-5 opacity-70" />
             </div>
-            <div className="text-[10px] opacity-90">
-              SonarQube
+            <div className="space-y-0.5">
+              <div className="flex items-baseline space-x-1.5">
+                <p className="text-xl font-bold">
+                  {kpiData.codeQuality.score >= 80 ? 'A' : kpiData.codeQuality.score >= 60 ? 'B' : 'C'}
+                </p>
+                <p className="text-[10px] opacity-75">{kpiData.codeQuality.score} pts</p>
+              </div>
+              <div className="text-[10px] opacity-90">
+                SonarQube
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Test Coverage */}
-        <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-sm p-3 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] opacity-90 font-medium">Test Coverage</p>
-            <TrendingUp className="h-5 w-5 opacity-70" />
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-baseline space-x-1.5">
-              <p className="text-xl font-bold">{testCoverage}%</p>
-              <p className="text-[10px] opacity-75">tests</p>
+        {loadingKPIs.testCoverage ? (
+          <KPISkeleton />
+        ) : (
+          <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-sm p-3 text-white">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] opacity-90 font-medium">Test Coverage</p>
+              <TrendingUp className="h-5 w-5 opacity-70" />
             </div>
-            <div className="text-[10px] opacity-90">
-              {testCoverage >= 80 ? '✓ OK' : '⚠ Mejorar'}
+            <div className="space-y-0.5">
+              <div className="flex items-baseline space-x-1.5">
+                <p className="text-xl font-bold">{kpiData.testCoverage.coverage}%</p>
+                <p className="text-[10px] opacity-75">tests</p>
+              </div>
+              <div className="text-[10px] opacity-90">
+                {kpiData.testCoverage.coverage >= 80 ? '✓ OK' : '⚠ Mejorar'}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Mi Último Despliegue - Expandible */}
